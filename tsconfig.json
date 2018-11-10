@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "allowJs": false,
+        "module": "system",
+        "moduleResolution": "node",
+        "outFile": "dist/bundle.js",
+        "target": "es5",
+        "typeRoots": [
+            "./node_modules/"
+        ],
+        "sourceMap": true
+    },
+    "include": [
+        "src/ts/*.ts"
+    ]
+}
