@@ -1,10 +1,10 @@
-import {Packet} from "./packet";
+import Packet from "./packet";
 
 export class NetworkClient {
     private socket: WebSocket;
 
     constructor(address: string) {
-        var _this = this;
+        const _this = this;
 
         this.socket = new WebSocket(`ws://${address}`);
         this.socket.onopen = function() {
