@@ -4,7 +4,7 @@
         "module": "system",
         "moduleResolution": "node",
         "outFile": "dist/bundle.js",
-        "target": "es5",
+        "target": "es6",
         "typeRoots": [
             "./node_modules/"
         ],

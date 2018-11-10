@@ -1,6 +1,6 @@
 import Packet from "./packet";
 
-export class NetworkClient {
+export default class NetworkClient {
     private socket: WebSocket;
 
     constructor(address: string) {
