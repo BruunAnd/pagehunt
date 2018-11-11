@@ -5,7 +5,8 @@ import Vector2 from "./vector2";
 import NetworkClient from './network';
 import Packet, {PacketType} from "./packets/packet";
 import {HandshakePacket} from "./packets/handshake";
-import {SpawnEntityPacket} from "./packets/spawnentity";
+import { SpawnEntityPacket } from "./packets/spawnentity";
+import MovementController from "./movement";
 
 export enum Direction {
     None = 0,
@@ -31,8 +32,6 @@ export class Game {
         this.drawContext = this.canvas.getContext('2d');
         this.tickInterval = setInterval(() => this.gameLoop(), 16);
         this.initNetworkClient();
-        this.player = this.buildPlayer(playerName);
-        this.map = this.buildMap();
         this.movementController = new MovementController(this.player);
         
         this.canvas.width = window.innerWidth;
@@ -63,11 +62,13 @@ export class Game {
         return new Map(new Vector2(2000, 2000));
     }
 
-    private buildPlayer(id: number, name?: string): Player {
-        if (name) {
+    private buildPlayer(id: number, name: string, pos?: Vector2): Player {
+        if (pos) {
+            return new Player(id, name, pos);
+        }
+        else {
             return new Player(id, name);
         }
-        return new Player(id);
     }
     
     private gameLoop(): void {

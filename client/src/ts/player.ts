@@ -3,8 +3,19 @@ import { EntityType } from "./mapentity";
 import Vector2 from "./vector2";
 
 export default class Player extends MapEntity {
-    constructor(id: number, name: string) {
-        super(1, EntityType.LocalPlayer, name);
+    constructor(id: number, name?: string, pos?: Vector2) {
+        if (name) {
+            if (pos) {
+                super(id, EntityType.LocalPlayer, name, pos);
+            }
+            else {
+                super(id, EntityType.LocalPlayer, name);
+            }
+        }
+        else {
+            super(id, EntityType.LocalPlayer);
+        }
+        
     }
 
     public move(direction: number, distance: number) {
