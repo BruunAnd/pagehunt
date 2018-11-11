@@ -26,10 +26,13 @@ export class Game {
     constructor(canvasId: string, playerName: string) {
         this.canvas = <HTMLCanvasElement>document.getElementById(canvasId);
         this.drawContext = this.canvas.getContext('2d');
-        this.tickInterval = setInterval(() => this.gameLoop(), 50);
+        this.tickInterval = setInterval(() => this.gameLoop(), 20);
         this.player = this.buildPlayer(playerName);
         this.map = this.buildMap();
         this.networkClient = new NetworkClient('localhost:4000');
+
+        this.canvas.width = this.map.mapSize.y;
+        this.canvas.height = this.map.mapSize.x;
         
         document.addEventListener('keydown', function (event) {
             Input.addKey(event.key);
@@ -42,7 +45,7 @@ export class Game {
 
     private buildMap(): Map {
         //Recieve map from server
-        return new Map(new Vector2(20, 20), [this.player]);
+        return new Map(new Vector2(2000, 2000), [this.player]);
     }
 
     private buildPlayer(name: string): Player {
@@ -98,27 +101,35 @@ export class Game {
                     case 1:
                         //Up
                         this.player.move(0, moveSpeed * dt);
+                        break;
                     case 2:
                         //Down
                         this.player.move(180, moveSpeed * dt);
+                        break;
                     case 4:
                         //Left
                         this.player.move(270, moveSpeed * dt);
+                        break;
                     case 5:
                         //Up & Left
                         this.player.move(315, moveSpeed * dt);
+                        break;
                     case 6:
                         //Down & Left
                         this.player.move(225, moveSpeed * dt);
+                        break;
                     case 8:
                         //Right
                         this.player.move(90, moveSpeed * dt);
+                        break;
                     case 9:
                         //Up & Right
                         this.player.move(45, moveSpeed * dt);
+                        break;
                     case 10:
                         //Down & Right
                         this.player.move(135, moveSpeed * dt);
+                        break;
                     default:
                     //Invalid combination
                 }

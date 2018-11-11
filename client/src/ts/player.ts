@@ -13,6 +13,11 @@ export default class Player extends MapEntity {
 
         //Correct position based on server feedback
 
-        this.pos = new Vector2(this.pos.x + distance * Math.sin(direction), this.pos.y + distance * Math.sin(direction));
+        console.log("Direction: " + direction);
+
+        console.log("x: " + Math.cos(direction * Math.PI / 180));
+        console.log("y: " + Math.sin(direction * Math.PI / 180));
+
+        this.pos = new Vector2(this.pos.x + distance * Math.cos(direction * Math.PI / 180), this.pos.y + distance * Math.sin(direction * Math.PI / 180));
     }
 }
