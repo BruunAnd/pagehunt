@@ -28,7 +28,7 @@ export class Game {
         this.canvas = <HTMLCanvasElement>document.getElementById(canvasId);
         this.drawContext = this.canvas.getContext('2d');
         this.tickInterval = setInterval(() => this.gameLoop(), 20);
-        this.networkClient = new NetworkClient('localhost:4000', this.packetReceived);
+        this.initNetworkClient();
         this.player = this.buildPlayer(playerName);
         this.map = this.buildMap();
         
