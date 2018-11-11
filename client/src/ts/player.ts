@@ -1,5 +1,6 @@
 import MapEntity, { EntityType } from "./mapentity";
 import Vector2 from "./vector2";
+import Map from "./map";
 
 export default class Player extends MapEntity {
     constructor(id: number, name?: string, pos?: Vector2) {
@@ -17,10 +18,14 @@ export default class Player extends MapEntity {
         
     }
 
-    public move(newPos: Vector2) {
-        //Send direction to server
-
-        //Make prediction for movement and start moving
+    public move(newPos: Vector2, map: Map) {
+        //Preliminary collision checking
+        for (let ent of map.getMapEntities()) {
+            if (ent.occupiesPosition(newPos)) {
+                //Position is occupied, cannot move!
+                return;
+            }
+        }
 
         //Correct position based on server feedback
         this.pos = newPos;
