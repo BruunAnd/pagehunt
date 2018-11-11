@@ -17,12 +17,12 @@ class GameServer:
         return self.entity_count
 
     async def handle_handshake(self, client, packet: HandshakePacket):
-        player = Player(packet.name, 10, 20)
+        player = Player(self.get_next_id(), packet.name, 10, 20)
 
         self.client_player_map[client] = player
 
         # Send spawn message to player
-        spawn_packet = SpawnEntityPacket(self.get_next_id(), True, player)
+        spawn_packet = SpawnEntityPacket(True, player)
         await self.sockets_server.send_packet(client, spawn_packet)
 
         # Broadcast spawn message to other players

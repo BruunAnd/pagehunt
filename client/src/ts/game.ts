@@ -5,8 +5,9 @@ import Vector2 from "./vector2";
 import NetworkClient from './network';
 import Packet, {PacketType} from "./packets/packet";
 import {HandshakePacket} from "./packets/handshake";
-import { SpawnEntityPacket } from "./packets/spawnentity";
+import {SpawnEntityPacket} from "./packets/spawnentity";
 import MovementController from "./movement";
+import MapEntity, {EntityType} from "./mapentity";
 
 export enum Direction {
     None = 0,
@@ -27,7 +28,7 @@ export class Game {
     networkClient: NetworkClient;
     movementController: MovementController;
     
-    constructor(canvasId: string, playerName: string) {
+    constructor(canvasId: string) {
         this.canvas = <HTMLCanvasElement>document.getElementById(canvasId);
         this.drawContext = this.canvas.getContext('2d');
         this.tickInterval = setInterval(() => this.gameLoop(), 16);
@@ -46,8 +47,7 @@ export class Game {
         window.addEventListener('resize', () => {
             this.canvas.width = window.innerWidth;
             this.canvas.height = window.innerHeight;
-        })
-
+        });
 
         this.enableInput = true;
     }
@@ -121,8 +121,14 @@ export class Game {
     }
 
     private handleSpawnEntity(packet: SpawnEntityPacket) {
+        const position = new Vector2(packet.x, packet.y);
+
         if (packet.isSelf) {
-            const player = this.buildPlayer(packet.id);
+            this.player = this.buildPlayer(packet.id, packet.name, position);
+            this.map.addMapEntities([this.player]);
+        } else {
+            const entity = new MapEntity(packet.id, EntityType.NetworkPlayer, packet.name, position);
+            this.map.addMapEntities([entity]);
         }
     }
 

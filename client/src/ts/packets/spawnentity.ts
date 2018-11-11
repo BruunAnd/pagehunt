@@ -14,7 +14,8 @@ export class SpawnEntityPacket extends Packet {
         this.y = packetDict['y'];
         this.id = packetDict['id'];
         this.isSelf = packetDict['isSelf'];
-        if (packetDict.contains('name')) {
+
+        if ('name' in packetDict) {
             this.name = packetDict['name'];
         }
     }
