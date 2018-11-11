@@ -11,7 +11,7 @@ export class EntityMovedPacket extends Packet {
         this.y = packetDict['y'];
     }
 
-    dictify(): string {
+    public dictify(): string {
         throw 42;
     }
 }

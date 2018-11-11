@@ -39,7 +39,6 @@ export class Game {
             Input.removeKey(event.key);
         });
         this.enableInput = true;
-        this.networkClient = new NetworkClient('localhost:4000', this.packetReceived);
     }
 
     private buildMap(): Map {
@@ -57,7 +56,7 @@ export class Game {
     private gameLoop(): void {
         let tickTime = Date.now();
         let dt = ((Date.now() - this.lastTickTime) / 1000) * 20;
-        this.lastTickTime = tickTime
+        this.lastTickTime = tickTime;
         this.tick(dt);
         this.draw();
     }
