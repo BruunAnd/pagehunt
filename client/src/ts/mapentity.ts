@@ -17,6 +17,7 @@ export default class MapEntity {
     }
 
     public draw(drawContext: CanvasRenderingContext2D) {
+        drawContext.fillStyle = '#FF0000';
         drawContext.fillRect(this.pos.x, this.pos.y, 32, 32);
     }
 }
