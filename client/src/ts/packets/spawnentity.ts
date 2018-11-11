@@ -20,7 +20,7 @@ export class SpawnEntityPacket extends Packet {
         }
     }
 
-    public dictify(): string {
+    public dictify(): any {
         throw 5;
     }
 

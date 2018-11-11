@@ -22,7 +22,11 @@ class GameServer:
 
     async def handle_movement(self, client, packet: MovementPacket):
         player = self.client_player_map[client]
-        direction = packet.direction
+        player.move_in_direction(packet.direction)
+
+        # Broadcast movement packet
+        movement = MovementPacket(player)
+        await self.sockets_server.broadcast_packet(movement)
 
     async def handle_handshake(self, client, packet: HandshakePacket):
         # Initialize player
