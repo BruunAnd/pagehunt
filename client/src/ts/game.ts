@@ -2,9 +2,9 @@ import Player from "./player";
 import Input from "./input";
 import Map from "./map";
 import Vector2 from "./vector2";
-import MapEntity from "./mapentity";
 import NetworkClient from './network';
 import Packet from "./packets/packet";
+import {HandshakePacket} from "./packets/handshake";
 
 enum Direction {
     None = 0,
@@ -51,6 +51,11 @@ export class Game {
 
 
         this.enableInput = true;
+    }
+
+    private initNetworkClient(): void {
+        this.networkClient = new NetworkClient('localhost:4000',
+            (packet: Packet) => this.packetReceived(packet));
     }
 
     private buildMap(): Map {
@@ -150,6 +155,8 @@ export class Game {
 
     public packetReceived(packet: Packet): void {
         console.log(packet);
+
+        this.networkClient.sendPacket(new HandshakePacket('Anders'));
     }
 
     public draw(): void {

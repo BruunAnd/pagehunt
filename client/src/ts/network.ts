@@ -1,28 +1,22 @@
 import Packet, {PacketType} from './packets/packet';
-import {HandshakePacket} from "./packets/handshake";
-import {EntityMovedPacket} from "./packets/entitymoved";
+import { EntityMovedPacket } from './packets/entitymoved';
 
 export default class NetworkClient {
     private socket: WebSocket;
-    private packetCallback: any;
+    private readonly packetCallback: (Packet) => void;
 
-    constructor(address: string, packetCallback) {
+    constructor(address: string, packetCallback: (Packet) => void) {
         this.packetCallback = packetCallback;
-        const _this = this;
 
         this.socket = new WebSocket(`ws://${address}`);
-        this.socket.onopen = function() {
-          return _this.onOpen();
-        };
-        this.socket.onmessage = function (event) {
-          return _this.onMessage(event);
-        };
-        this.socket.onclose = function() {
-          return _this.onClose();
-        };
-        this.socket.onerror =  function (event) {
-          return _this.onError(event);
-        };
+        this.socket.onopen = () => this.onOpen();
+        this.socket.onmessage = (event) => this.onMessage(event);
+        this.socket.onclose = () => this.onClose();
+        this.socket.onerror = (event) => this.onError(event);
+    }
+
+    public sendPacket(packet: Packet): void {
+        this.socket.send(JSON.stringify(packet.dictify()));
     }
 
     private onError(event): any {
