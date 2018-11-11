@@ -22,10 +22,19 @@ class SocketsServer:
         self.loop.run_until_complete(ws_server)
         self.loop.run_forever()
 
-    async def broadcast_packet(self, packet):
+    async def broadcast_packet(self, packet, exclude_clients=None):
         serialized = json.dumps(packet.dictify())
 
-        await asyncio.wait([client.send(serialized) for client in self.clients])
+        # Exclude clients if specified
+        clients = self.clients
+        if exclude_clients:
+            clients = {client for client in clients if client not in exclude_clients}
+
+        if not clients:
+            # Cannot call wait on an empty list, so we need to return in this case
+            return
+
+        await asyncio.wait([client.send(serialized) for client in clients])
 
     async def handle_messages(self, client):
         while True:

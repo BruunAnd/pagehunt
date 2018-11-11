@@ -9,8 +9,8 @@ export enum EntityType {
 }
 
 export default class MapEntity {
-    id: number;
-    pos: Vector2 = new Vector2(0, 0);
+    public id: number;
+    public pos: Vector2 = new Vector2(0, 0);
     name: string;
     type: EntityType;
 
