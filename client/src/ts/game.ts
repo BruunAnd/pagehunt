@@ -2,9 +2,9 @@ import Player from "./player";
 import Input from "./input";
 import Map from "./map";
 import Vector2 from "./vector2";
-import MapEntity from "./mapentity";
 import NetworkClient from './network';
 import Packet from "./packets/packet";
+import {HandshakePacket} from "./packets/handshake";
 
 enum Direction {
     None = 0,
@@ -30,7 +30,7 @@ export class Game {
         this.tickInterval = setInterval(() => this.gameLoop(), 20);
         this.player = this.buildPlayer(playerName);
         this.map = this.buildMap();
-        this.networkClient = new NetworkClient('localhost:4000', this.packetReceived);
+        this.initNetworkClient();
 
         this.canvas.width = this.map.mapSize.x;
         this.canvas.height = this.map.mapSize.y;
@@ -44,15 +44,20 @@ export class Game {
         this.enableInput = true;
     }
 
+    private initNetworkClient(): void {
+        this.networkClient = new NetworkClient('localhost:4000',
+            (packet: Packet) => this.packetReceived(packet));
+    }
+
     private buildMap(): Map {
         //Receive map from server
         return new Map(new Vector2(2000, 2000), [this.player]);
     }
 
     private buildPlayer(name: string): Player {
-        //Register player on server
+        // Register player on server
 
-        //Recieve player id from server
+        // Receive player id from server
         return new Player(name);
     }
     
@@ -140,6 +145,8 @@ export class Game {
 
     public packetReceived(packet: Packet): void {
         console.log(packet);
+
+        this.networkClient.sendPacket(new HandshakePacket('Anders'));
     }
 
     public draw(): void {
