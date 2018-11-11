@@ -6,8 +6,9 @@ import NetworkClient from './network';
 import Packet from "./packets/packet";
 import {HandshakePacket} from "./packets/handshake";
 import MapEntity from "./mapentity";
+import MovementController from "./movement";
 
-enum Direction {
+export enum Direction {
     None = 0,
     Up = 1 << 0,    // 0001 -- the bitshift is unnecessary, but done for consistency
     Down = 1 << 1,  // 0010
@@ -24,14 +25,16 @@ export class Game {
     tickInterval: any;
     enableInput: boolean = false;
     networkClient: NetworkClient;
+    movementController: MovementController;
     
     constructor(canvasId: string, playerName: string) {
         this.canvas = <HTMLCanvasElement>document.getElementById(canvasId);
         this.drawContext = this.canvas.getContext('2d');
-        this.tickInterval = setInterval(() => this.gameLoop(), 20);
+        this.tickInterval = setInterval(() => this.gameLoop(), 16);
         this.initNetworkClient();
         this.player = this.buildPlayer(playerName);
         this.map = this.buildMap();
+        this.movementController = new MovementController(this.player);
         
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
@@ -78,12 +81,11 @@ export class Game {
 
     private tick(dt: number): void {
         if (this.enableInput) {
-            let moveSpeed = 10;
-            this.movement(moveSpeed * dt);
+            this.checkMovement(dt);
         }
     }
 
-    private movement(distance) {
+    private checkMovement(dt: number) {
         let dir: Direction = Direction.None;
 
         if (Input.getKey("w")) {
@@ -114,44 +116,8 @@ export class Game {
             }
         }
 
-        if (dir != Direction.None) {
-            switch (dir) {
-                case 1:
-                    //Up
-                    this.player.move(-90, distance);
-                    break;
-                case 2:
-                    //Down
-                    this.player.move(90, distance);
-                    break;
-                case 4:
-                    //Left
-                    this.player.move(-180, distance);
-                    break;
-                case 5:
-                    //Up & Left
-                    this.player.move(-135, distance);
-                    break;
-                case 6:
-                    //Down & Left
-                    this.player.move(-225, distance);
-                    break;
-                case 8:
-                    //Right
-                    this.player.move(0, distance);
-                    break;
-                case 9:
-                    //Up & Right
-                    this.player.move(-45, distance);
-                    break;
-                case 10:
-                    //Down & Right
-                    this.player.move(45, distance);
-                    break;
-                default:
-                //Invalid combination
-            }
-        }
+        let moveSpeed: number = 10;
+        this.movementController.moveInDirection(dir, moveSpeed * dt);
     }
 
     public packetReceived(packet: Packet): void {
