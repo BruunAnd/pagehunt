@@ -10,8 +10,8 @@ import MovementController from "./movement";
 import MapEntity, {EntityType} from "./mapentity";
 import { MovementPacket } from "./packets/movement";
 import { RepositionPacket } from "./packets/reposition";
-import Camera from "./camera.ts";
-import Vector2D from "./vector2new.ts";
+import Camera from "./camera";
+import Vector2D from "./vector2new";
 
 export enum Direction {
     None = 0,
@@ -126,9 +126,10 @@ export class Game {
 
         let moveSpeed: number = 10;
         this.movementController.moveInDirection(dir, moveSpeed * dt);
+        this.sendMovement(dir);
     }
 
-    private sendMovement(direction: any) {
+    private sendMovement(direction: number) {
         this.networkClient.sendPacket(new MovementPacket(direction));
     }
 
