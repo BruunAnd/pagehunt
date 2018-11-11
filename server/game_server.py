@@ -32,7 +32,7 @@ class GameServer:
 
         # Broadcast spawn message to other players
         spawn_packet.is_self = False
-        # TODO: Broadcast to other players
+        await self.sockets_server.broadcast_packet(spawn_packet, exclude_clients={client})
 
     async def packet_received(self, client, packet):
         handlers = {PacketType.Handshake: self.handle_handshake}
