@@ -1,5 +1,4 @@
-import MapEntity from "./mapentity";
-import { EntityType } from "./mapentity";
+import MapEntity, { EntityType } from "./mapentity";
 import Vector2 from "./vector2";
 
 export default class Player extends MapEntity {
