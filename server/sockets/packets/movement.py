@@ -10,4 +10,4 @@ class MovementPacket(Packet):
         pass
 
     def get_type(self):
-        return PacketType.MovementPacket
+        return PacketType.Movement

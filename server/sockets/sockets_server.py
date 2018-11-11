@@ -1,11 +1,9 @@
 import asyncio
 import json
-import struct
 
 import websockets
 
 from server.sockets.packets import PacketType
-from server.sockets.packets.entity_moved import EntityMovedPacket
 from server.sockets.packets.handshake import HandshakePacket
 from server.sockets.packets.movement import MovementPacket
 from server.sockets.packets.packet import Packet
@@ -62,4 +60,4 @@ class SocketsServer:
     def construct_packet(self, data):
         # Highly readable switch using a dictionary
         return {PacketType.Handshake: HandshakePacket,
-                PacketType.Reposition: MovementPacket}[data['type']](data)
+                PacketType.Movement: MovementPacket}[data['type']](data)

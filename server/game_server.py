@@ -4,6 +4,7 @@ from server.game.player import Player
 from server.sockets.packets import PacketType
 from server.sockets.packets.handshake import HandshakePacket
 from server.sockets.packets.movement import MovementPacket
+from server.sockets.packets.reposition import RepositionPacket
 from server.sockets.packets.spawn_entity import SpawnEntityPacket
 from server.sockets.sockets_server import SocketsServer
 
@@ -25,7 +26,7 @@ class GameServer:
         player.move_in_direction(packet.direction)
 
         # Broadcast movement packet
-        movement = MovementPacket(player)
+        movement = RepositionPacket(player)
         await self.sockets_server.broadcast_packet(movement)
 
     async def handle_handshake(self, client, packet: HandshakePacket):
@@ -52,7 +53,8 @@ class GameServer:
         await self.sockets_server.broadcast_packet(spawn_packet, exclude_clients={client})
 
     async def packet_received(self, client, packet):
-        handlers = {PacketType.Handshake: self.handle_handshake}
+        handlers = {PacketType.Handshake: self.handle_handshake,
+                    PacketType.Movement: self.handle_movement}
 
         await handlers[packet.get_type()](client, packet)
 

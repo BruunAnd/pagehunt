@@ -1,6 +1,7 @@
 import Packet, { PacketType } from './packets/packet';
 import { EntityMovedPacket } from './packets/entitymoved';
 import { SpawnEntityPacket } from './packets/spawnentity';
+import {RepositionPacket} from "./packets/reposition";
 
 export default class NetworkClient {
     private socket: WebSocket;
@@ -31,6 +32,8 @@ export default class NetworkClient {
                 return new EntityMovedPacket(packetDict);
             case PacketType.SpawnEntity:
                 return new SpawnEntityPacket(packetDict);
+            case PacketType.Reposition:
+                return new RepositionPacket(packetDict);
         }
 
         return null;

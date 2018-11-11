@@ -124,9 +124,9 @@ export class Game {
             }
         }
 
-        let moveSpeed: number = 10;
         //this.movementController.moveInDirection(dir, moveSpeed * dt);
-        this.sendMovement(dir);
+        if (dir != Direction.None)
+            this.sendMovement(dir);
     }
 
     private sendMovement(direction: number) {
