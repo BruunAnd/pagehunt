@@ -4,6 +4,7 @@ import Map from "./map";
 import Vector2 from "./vector2";
 import MapEntity from "./mapentity";
 import NetworkClient from './network';
+import Packet from "./packets/packet";
 
 enum Direction {
     None = 0,
@@ -29,7 +30,7 @@ export class Game {
         this.tickInterval = setInterval(() => this.gameLoop(), 50);
         this.player = this.buildPlayer(playerName);
         this.map = this.buildMap();
-        this.networkClient = new NetworkClient('localhost:4000');
+        this.networkClient = new NetworkClient('localhost:4000', this.packetReceived);
         
         document.addEventListener('keydown', function (event) {
             Input.addKey(event.key);
@@ -38,6 +39,7 @@ export class Game {
             Input.removeKey(event.key);
         });
         this.enableInput = true;
+        this.networkClient = new NetworkClient('localhost:4000', this.packetReceived);
     }
 
     private buildMap(): Map {
@@ -126,7 +128,11 @@ export class Game {
         }
     }
 
-    private draw(): void {
+    public packetReceived(packet: Packet): void {
+        console.log(packet);
+    }
+
+    public draw(): void {
         this.drawContext.fillStyle = '#FF0000';
         this.drawContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (let ent of this.map.getMapEntities()) {
