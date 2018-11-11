@@ -127,7 +127,7 @@ export class Game {
         if (dir != Direction.None) {
             const moveSpeed = 10;
             this.sendMovement(MovementController.getDegreesFromDirection(dir));
-            this.player.move(MovementController.getNewLocation(this.player.pos, dir, moveSpeed * dt));
+            this.player.move(MovementController.getNewLocation(this.player.pos, dir, moveSpeed * dt), this.map);
         }
     }
 

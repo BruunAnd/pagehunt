@@ -35,8 +35,7 @@ export default class Player extends MapEntity {
                 return;
             }
         }
-
-        //Correct position based on server feedback
+        
         this.pos = newPos;
     }
 

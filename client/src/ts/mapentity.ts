@@ -46,7 +46,7 @@ export default class MapEntity {
            (this.pos.x + 32) > position.x  &&
            this.pos.y > (position.y + 32)  &&
            (this.pos.y + 32) < position.y) {
-            return true;
+               return true;
         }
         return false;
     }
