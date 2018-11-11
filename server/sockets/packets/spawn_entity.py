@@ -4,8 +4,7 @@ from server.sockets.packets.packet import Packet
 
 
 class SpawnEntityPacket(Packet):
-    def __init__(self, id: int, is_self: bool, entity):
-        self.id = id
+    def __init__(self, is_self: bool, entity):
         self.is_self = is_self
         self.entity = entity
 
@@ -13,7 +12,9 @@ class SpawnEntityPacket(Packet):
             self.name = self.entity.name
 
     def dictify(self):
-        values = dict(type=PacketType.SpawnEntity, id=self.id, isSelf=self.is_self, x=self.entity.x, y=self.entity.y)
+        values = dict(type=PacketType.SpawnEntity, id=self.entity.id, isSelf=self.is_self, x=self.entity.x,
+                      y=self.entity.y)
+
         if self.name:
             values['name'] = self.name
 
