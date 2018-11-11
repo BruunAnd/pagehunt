@@ -125,7 +125,7 @@ export class Game {
         }
 
         let moveSpeed: number = 10;
-        this.movementController.moveInDirection(dir, moveSpeed * dt);
+        //this.movementController.moveInDirection(dir, moveSpeed * dt);
         this.sendMovement(dir);
     }
 
