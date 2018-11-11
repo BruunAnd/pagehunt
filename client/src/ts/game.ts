@@ -122,7 +122,7 @@ export class Game {
 
     private handleSpawnEntity(packet: SpawnEntityPacket) {
         if (packet.isSelf) {
-            
+            const player = this.buildPlayer(packet.id);
         }
     }
 

@@ -5,6 +5,7 @@ export class SpawnEntityPacket extends Packet {
     public y = 0.0
     public id = 0;
     public isSelf: boolean;
+    public name: string;
 
     constructor(packetDict: any) {
         super();
@@ -13,6 +14,9 @@ export class SpawnEntityPacket extends Packet {
         this.y = packetDict['y'];
         this.id = packetDict['id'];
         this.isSelf = packetDict['isSelf'];
+        if (packetDict.contains('name')) {
+            this.name = packetDict['name'];
+        }
     }
 
     public dictify(): string {
