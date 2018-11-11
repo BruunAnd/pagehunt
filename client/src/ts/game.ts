@@ -9,6 +9,7 @@ import {SpawnEntityPacket} from "./packets/spawnentity";
 import MovementController from "./movement";
 import MapEntity, {EntityType} from "./mapentity";
 import {MovementPacket} from "./packets/movement";
+import {RepositionPacket} from "./packets/reposition";
 
 export enum Direction {
     None = 0,
@@ -138,9 +139,18 @@ export class Game {
         }
     }
 
+    private handleReposition(packet: RepositionPacket) {
+        this.map.getMapEntities().forEach(function (element: MapEntity) {
+            if (element.id === packet.id) {
+                element.pos = new Vector2(packet.x, packet.y);
+            }
+        });
+    }
+
     public packetReceived(packet: Packet): void {
         switch (packet.getType()) {
             case PacketType.SpawnEntity: return this.handleSpawnEntity(<SpawnEntityPacket> packet);
+            case PacketType.Reposition: return this.handleReposition(<RepositionPacket> packet);
         }
     }
 
