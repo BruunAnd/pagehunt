@@ -1,3 +1,5 @@
+import random
+
 from server.game.player import Player
 from server.sockets.packets import PacketType
 from server.sockets.packets.handshake import HandshakePacket
@@ -17,8 +19,11 @@ class GameServer:
         return self.entity_count
 
     async def handle_handshake(self, client, packet: HandshakePacket):
-        player = Player(self.get_next_id(), packet.name, 10, 20)
+        # Initialize player
+        x, y = random.uniform(0, 300), random.uniform(0, 300)
+        player = Player(self.get_next_id(), packet.name, x, y)
 
+        # Add to client->player map
         self.client_player_map[client] = player
 
         # Send spawn message to player
