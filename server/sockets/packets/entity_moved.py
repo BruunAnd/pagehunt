@@ -9,3 +9,6 @@ class EntityMovedPacket(Packet):
 
     def dictify(self):
         return dict(type=PacketType.EntityMoved, x=self.x, y=self.y)
+
+    def get_type(self):
+        return PacketType.EntityMoved

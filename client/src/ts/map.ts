@@ -5,13 +5,12 @@ export default class Map {
     mapSize: Vector2;
     mapEntities: MapEntity[] = [];
 
-    constructor(size: Vector2, entities?: MapEntity[]) {
+    constructor(size: Vector2) {
         this.mapSize = size;
-        this.mapEntities = entities;
     }
 
-    public addMapEntities(enteties: MapEntity[]) {
-        for (let ent of enteties) {
+    public addMapEntities(entities: MapEntity[]) {
+        for (const ent of entities) {
             this.mapEntities.push(ent);
         }
     }

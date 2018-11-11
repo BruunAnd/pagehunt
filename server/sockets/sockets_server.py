@@ -31,7 +31,7 @@ class SocketsServer:
         while True:
             packet = self.construct_packet(json.loads(await client.recv()))
 
-            self.packet_callback(client, packet)
+            await self.packet_callback(client, packet)
 
     async def send_packet(self, client, packet: Packet):
         await client.send(json.dumps(packet.dictify()))
@@ -41,7 +41,6 @@ class SocketsServer:
         print(f'Connection from {client.remote_address}')
 
         try:
-            await self.send_packet(client, EntityMovedPacket(59.666667, 2.0))
             await self.handle_messages(client)
         except websockets.ConnectionClosed:
             await self.disconnect(client)
@@ -51,6 +50,5 @@ class SocketsServer:
         self.clients.remove(client)
 
     def construct_packet(self, data):
-        type = data['type']
-
-        return {PacketType.Handshake: HandshakePacket}[type](data)
+        # Highly readable switch using a dictionary
+        return {PacketType.Handshake: HandshakePacket}[data['type']](data)

@@ -10,4 +10,8 @@ export class HandshakePacket extends Packet {
     public dictify(): any {
         return {'type': this.type, 'name': this.name};
     }
+
+    public getType(): PacketType {
+        return PacketType.Handshake;
+    }
 }

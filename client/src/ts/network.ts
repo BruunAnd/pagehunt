@@ -1,13 +1,13 @@
 import Packet, {PacketType} from './packets/packet';
 import { EntityMovedPacket } from './packets/entitymoved';
+import {SpawnEntity, SpawnEntityPacket} from "./packets/spawnentity";
 
 export default class NetworkClient {
     private socket: WebSocket;
-    private readonly packetCallback: (Packet) => void;
 
-    constructor(address: string, packetCallback: (Packet) => void) {
-        this.packetCallback = packetCallback;
-
+    constructor(address: string,
+                private packetCallback: (Packet) => void,
+                private connectedCallback: () => void) {
         this.socket = new WebSocket(`ws://${address}`);
         this.socket.onopen = () => this.onOpen();
         this.socket.onmessage = (event) => this.onMessage(event);
@@ -29,6 +29,8 @@ export default class NetworkClient {
         switch (type) {
             case PacketType.EntityMoved:
                 return new EntityMovedPacket(packetDict);
+            case PacketType.SpawnEntity:
+                return new SpawnEntityPacket(packetDict);
         }
 
         return null;
@@ -39,7 +41,7 @@ export default class NetworkClient {
     }
 
     private onOpen(): any {
-        console.log('Connection opened');
+        this.connectedCallback();
     }
 
     private onClose(): any {

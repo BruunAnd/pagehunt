@@ -3,10 +3,9 @@ import Input from "./input";
 import Map from "./map";
 import Vector2 from "./vector2";
 import NetworkClient from './network';
-import Packet from "./packets/packet";
+import Packet, {PacketType} from "./packets/packet";
 import {HandshakePacket} from "./packets/handshake";
-import MapEntity from "./mapentity";
-import MovementController from "./movement";
+import {SpawnEntityPacket} from "./packets/spawnentity";
 
 export enum Direction {
     None = 0,
@@ -56,12 +55,12 @@ export class Game {
 
     private initNetworkClient(): void {
         this.networkClient = new NetworkClient('localhost:4000',
-            (packet: Packet) => this.packetReceived(packet));
+            (packet: Packet) => this.packetReceived(packet), () => this.onConnected());
     }
 
     private buildMap(): Map {
         //Receive map from server
-        return new Map(new Vector2(2000, 2000), [this.player]);
+        return new Map(new Vector2(2000, 2000));
     }
 
     private buildPlayer(id: number, name?: string): Player {
@@ -120,9 +119,19 @@ export class Game {
         this.movementController.moveInDirection(dir, moveSpeed * dt);
     }
 
-    public packetReceived(packet: Packet): void {
-        console.log(packet);
+    private handleSpawnEntity(packet: SpawnEntityPacket) {
+        if (packet.isSelf) {
+            
+        }
+    }
 
+    public packetReceived(packet: Packet): void {
+        switch (packet.getType()) {
+            case PacketType.SpawnEntity: return this.handleSpawnEntity(<SpawnEntityPacket> packet);
+        }
+    }
+
+    public onConnected(): void {
         this.networkClient.sendPacket(new HandshakePacket('Anders'));
     }
 
