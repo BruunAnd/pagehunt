@@ -1,9 +1,9 @@
 import Packet, {PacketType} from "./packet";
 
 export class RepositionPacket extends Packet {
-    public x = 0.0;
-    public y = 0.0;
-    public id = 0;
+    public x: number;
+    public y: number;
+    public id: number;
 
     constructor(packetDict: any) {
         super();

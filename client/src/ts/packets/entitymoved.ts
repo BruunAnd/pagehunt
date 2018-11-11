@@ -1,8 +1,8 @@
 import Packet, {PacketType} from './packet';
 
 export class EntityMovedPacket extends Packet {
-    public x = 0.0;
-    public y = 0.0;
+    public x: number;
+    public y: number;
 
     constructor(packetDict: any) {
         super();

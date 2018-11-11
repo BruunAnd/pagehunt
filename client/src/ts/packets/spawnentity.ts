@@ -1,9 +1,9 @@
 import Packet, {PacketType} from './packet';
 
 export class SpawnEntityPacket extends Packet {
-    public x = 0.0;
-    public y = 0.0;
-    public id = 0;
+    public x: number;
+    public y: number;
+    public id: number;
     public isSelf: boolean;
     public name: string;
 
