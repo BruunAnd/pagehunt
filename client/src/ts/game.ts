@@ -7,7 +7,9 @@ import Packet, {PacketType} from "./packets/packet";
 import {HandshakePacket} from "./packets/handshake";
 import {SpawnEntityPacket} from "./packets/spawnentity";
 import MovementController from "./movement";
-import MapEntity, {EntityType} from "./mapentity";
+import MapEntity, { EntityType } from "./mapentity";
+import Camera from "./camera";
+import Vector2D from "./vector2new";
 
 export enum Direction {
     None = 0,
@@ -27,12 +29,14 @@ export class Game {
     enableInput: boolean = false;
     networkClient: NetworkClient;
     movementController: MovementController;
+    camera: Camera
     
     constructor(canvasId: string) {
         this.canvas = <HTMLCanvasElement>document.getElementById(canvasId);
         this.drawContext = this.canvas.getContext('2d');
         this.tickInterval = setInterval(() => this.gameLoop(), 16);
         this.initNetworkClient();
+        this.camera = new Camera(new Vector2D(0, 0));
         this.map = this.buildMap();//TODO: Get map from server
 
         this.canvas.width = window.innerWidth;
@@ -83,6 +87,8 @@ export class Game {
         if (this.enableInput) {
             this.checkMovement(dt);
         }
+
+        this.camera.tick();
     }
 
     private checkMovement(dt: number) {
