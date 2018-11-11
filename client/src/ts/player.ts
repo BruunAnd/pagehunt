@@ -19,6 +19,15 @@ export default class Player extends MapEntity {
     }
 
     public move(newPos: Vector2, map: Map) {
+        //Check if we are trying to move out of the map
+        if (newPos.x < 0                   ||
+           (newPos.x + 32) > map.mapSize.x ||
+           newPos.y < 0                    ||
+           (newPos.y + 32) > map.mapSize.y) {
+                //newPos is outside map boundries
+                return;
+        }
+
         //Preliminary collision checking
         for (let ent of map.getMapEntities()) {
             if (ent.occupiesPosition(newPos)) {
