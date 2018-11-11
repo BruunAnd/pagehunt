@@ -30,10 +30,10 @@ export class Game {
         this.tickInterval = setInterval(() => this.gameLoop(), 20);
         this.player = this.buildPlayer(playerName);
         this.map = this.buildMap();
-        this.networkClient = new NetworkClient('localhost:4000');
+        this.networkClient = new NetworkClient('localhost:4000', this.packetReceived);
 
-        this.canvas.width = this.map.mapSize.y;
-        this.canvas.height = this.map.mapSize.x;
+        this.canvas.width = this.map.mapSize.x;
+        this.canvas.height = this.map.mapSize.y;
         
         document.addEventListener('keydown', function (event) {
             Input.addKey(event.key);
@@ -45,7 +45,7 @@ export class Game {
     }
 
     private buildMap(): Map {
-        //Recieve map from server
+        //Receive map from server
         return new Map(new Vector2(2000, 2000), [this.player]);
     }
 
