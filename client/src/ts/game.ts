@@ -124,9 +124,10 @@ export class Game {
             }
         }
 
-        //this.movementController.moveInDirection(dir, moveSpeed * dt);
-        if (dir != Direction.None)
-            this.sendMovement(dir);
+        if (dir != Direction.None) {
+
+            this.sendMovement(MovementController.getDegreesFromDirection(dir));
+        }
     }
 
     private sendMovement(direction: number) {
@@ -138,7 +139,6 @@ export class Game {
 
         if (packet.isSelf) {
             this.player = this.buildPlayer(packet.id, packet.name, position);
-            this.movementController = new MovementController(this.player);
             this.map.addMapEntities([this.player]);
         } else {
             const entity = new MapEntity(packet.id, EntityType.NetworkPlayer, packet.name, position);

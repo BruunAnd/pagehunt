@@ -1,51 +1,45 @@
 import { Direction } from "./game";
-import Player from "./player";
+import Vector2 from "./vector2";
 
 export default class MovementController {
-    player: Player;
-    
-    constructor(player: Player) {
-        this.player = player
+    public static getNewLocation(currentPos: Vector2, direction: Direction, distance: number): Vector2 {
+        return this.calculateNewPosition(currentPos, this.getDegreesFromDirection(direction), distance)
     }
 
-    public moveInDirection(direction: Direction, distance: number) {
+    public static getDegreesFromDirection(direction: Direction): number {
         if (direction != Direction.None) {
             switch (direction) {
                 case 1:
                     //Up
-                    this.player.move(-90, distance);
-                    break;
+                    return -90;
                 case 2:
                     //Down
-                    this.player.move(90, distance);
-                    break;
+                    return 90;
                 case 4:
                     //Left
-                    this.player.move(-180, distance);
-                    break;
+                    return -180;
                 case 5:
                     //Up & Left
-                    this.player.move(-135, distance);
-                    break;
+                    return -135;
                 case 6:
                     //Down & Left
-                    this.player.move(-225, distance);
-                    break;
+                    return -225;
                 case 8:
                     //Right
-                    this.player.move(0, distance);
-                    break;
+                    return 0;
                 case 9:
                     //Up & Right
-                    this.player.move(-45, distance);
-                    break;
+                    return -45;
                 case 10:
                     //Down & Right
-                    this.player.move(45, distance);
-                    break;
+                    return 45;
                 default:
                 //Invalid combination
             }
         }
+    }
+
+    private static calculateNewPosition(currentPos: Vector2, degrees: number, distance: number): Vector2 {
+        return new Vector2(currentPos.x + distance * Math.cos(degrees * Math.PI / 180), currentPos.y + distance * Math.sin(degrees * Math.PI / 180));
     }
 }
