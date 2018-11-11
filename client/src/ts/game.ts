@@ -4,6 +4,7 @@ import Map from "./map";
 import Vector2 from "./vector2";
 import MapEntity from "./mapentity";
 import NetworkClient from './network';
+import Packet from "./packets/packet";
 
 enum Direction {
     None = 0,
@@ -58,7 +59,7 @@ export class Game {
     private gameLoop(): void {
         let tickTime = Date.now();
         let dt = ((Date.now() - this.lastTickTime) / 1000) * 20;
-        this.lastTickTime = tickTime
+        this.lastTickTime = tickTime;
         this.tick(dt);
         this.draw();
     }
@@ -137,7 +138,11 @@ export class Game {
         }
     }
 
-    private draw(): void {
+    public packetReceived(packet: Packet): void {
+        console.log(packet);
+    }
+
+    public draw(): void {
         this.drawContext.fillStyle = '#FF0000';
         this.drawContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (let ent of this.map.getMapEntities()) {

@@ -1,7 +1,11 @@
 import asyncio
+import json
 import struct
 
 import websockets
+
+from server.sockets.packets.entity_moved import EntityMovedPacket
+from server.sockets.packets.packet import Packet
 
 
 class SocketsServer:
@@ -17,25 +21,19 @@ class SocketsServer:
 
     async def handle_messages(self, client):
         while True:
-            message = await client.recv()
-            unpacked = struct.unpack('<B', message)
+            message = json.loads(await client.recv())
 
-            print(f'Received message {client.remote_address}, {unpacked[0]}')
+            # broadcast: await asyncio.wait([client.send(message) for client in self.clients])
 
-            await asyncio.wait([client.send(message) for client in self.clients])
-
-    async def send_packet(self, client, packet):
-        data = bytearray()
-        data.append(123)
-
-        await client.send(bytes(data))
+    async def send_packet(self, client, packet: Packet):
+        await client.send(json.dumps(packet.dictify()))
 
     async def connected(self, client: websockets.WebSocketServerProtocol, path):
         self.clients.add(client)
         print(f'Connection from {client.remote_address}')
 
         try:
-            await self.send_packet(client, None)
+            await self.send_packet(client, EntityMovedPacket(59.666667, 2.0))
             await self.handle_messages(client)
         except websockets.ConnectionClosed:
             await self.disconnect(client)
