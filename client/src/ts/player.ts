@@ -1,9 +1,10 @@
-import MapEntity from "./mapentity"
+import MapEntity from "./mapentity";
+import { EntityType } from "./mapentity";
 import Vector2 from "./vector2";
 
 export default class Player extends MapEntity {
-    constructor(name: string) {
-        super(1, name);
+    constructor(id: number, name: string) {
+        super(1, EntityType.LocalPlayer, name);
     }
 
     public move(direction: number, distance: number) {

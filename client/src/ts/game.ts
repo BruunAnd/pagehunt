@@ -21,8 +21,8 @@ export class Game {
     player: Player;
     map: Map;
     drawContext: CanvasRenderingContext2D;
-    lastTickTime: any = Date.now();
-    tickInterval: any;
+    lastTickTime: number = Date.now();
+    tickInterval: number;
     enableInput: boolean = false;
     networkClient: NetworkClient;
     movementController: MovementController;
@@ -39,18 +39,15 @@ export class Game {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         
-        document.addEventListener('keydown', function (event) {
+        document.addEventListener('keydown', (event) => {
             Input.addKey(event.key);
         });
-        document.addEventListener('keyup', function (event) {
+        document.addEventListener('keyup', (event) => {
             Input.removeKey(event.key);
         });
-        
-        let self = this;
-        window.addEventListener('resize', function (event) {
-            console.log("Window resized");
-            self.canvas.width = window.innerWidth;
-            self.canvas.height = window.innerHeight;
+        window.addEventListener('resize', () => {
+            this.canvas.width = window.innerWidth;
+            this.canvas.height = window.innerHeight;
         })
 
 
@@ -64,11 +61,14 @@ export class Game {
 
     private buildMap(): Map {
         //Receive map from server
-        return new Map(new Vector2(2000, 2000), [this.player, new MapEntity(2, "Ent2", new Vector2(100, 50))]);
+        return new Map(new Vector2(2000, 2000), [this.player]);
     }
 
-    private buildPlayer(name: string): Player {
-        return new Player(name);
+    private buildPlayer(id: number, name?: string): Player {
+        if (name) {
+            return new Player(id, name);
+        }
+        return new Player(id);
     }
     
     private gameLoop(): void {
