@@ -8,6 +8,7 @@ import {HandshakePacket} from "./packets/handshake";
 import {SpawnEntityPacket} from "./packets/spawnentity";
 import MovementController from "./movement";
 import MapEntity, {EntityType} from "./mapentity";
+import {MovementPacket} from "./packets/movement";
 
 export enum Direction {
     None = 0,
@@ -118,6 +119,10 @@ export class Game {
 
         let moveSpeed: number = 10;
         this.movementController.moveInDirection(dir, moveSpeed * dt);
+    }
+
+    private sendMovement(direction: any) {
+        this.networkClient.sendPacket(new MovementPacket(direction));
     }
 
     private handleSpawnEntity(packet: SpawnEntityPacket) {

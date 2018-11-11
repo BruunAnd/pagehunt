@@ -12,7 +12,7 @@ class SpawnEntityPacket(Packet):
             self.name = self.entity.name
 
     def dictify(self):
-        values = dict(type=PacketType.SpawnEntity, id=self.entity.id, isSelf=self.is_self, x=self.entity.x,
+        values = dict(type=self.get_type(), id=self.entity.id, isSelf=self.is_self, x=self.entity.x,
                       y=self.entity.y)
 
         if self.name:
