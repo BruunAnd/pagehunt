@@ -1,6 +1,6 @@
-import Packet, {PacketType} from './packets/packet';
+import Packet, { PacketType } from './packets/packet';
 import { EntityMovedPacket } from './packets/entitymoved';
-import {SpawnEntity, SpawnEntityPacket} from "./packets/spawnentity";
+import { SpawnEntityPacket } from './packets/spawnentity';
 
 export default class NetworkClient {
     private socket: WebSocket;

@@ -33,14 +33,8 @@ export class Game {
         this.drawContext = this.canvas.getContext('2d');
         this.tickInterval = setInterval(() => this.gameLoop(), 16);
         this.initNetworkClient();
-        this.movementController = new MovementController(this.player);
-
-
-
         this.map = this.buildMap();//TODO: Get map from server
 
-
-        
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         
@@ -131,6 +125,7 @@ export class Game {
 
         if (packet.isSelf) {
             this.player = this.buildPlayer(packet.id, packet.name, position);
+            this.movementController = new MovementController(this.player);
             this.map.addMapEntities([this.player]);
         } else {
             const entity = new MapEntity(packet.id, EntityType.NetworkPlayer, packet.name, position);
