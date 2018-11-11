@@ -5,6 +5,7 @@ import Vector2 from "./vector2";
 import NetworkClient from './network';
 import Packet from "./packets/packet";
 import {HandshakePacket} from "./packets/handshake";
+import MapEntity from "./mapentity";
 
 enum Direction {
     None = 0,
