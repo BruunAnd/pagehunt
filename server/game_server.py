@@ -1,12 +1,12 @@
 import random
 
 from server.game.player import Player
-from server.sockets.packets import PacketType
-from server.sockets.packets.handshake import HandshakePacket
-from server.sockets.packets.movement import MovementPacket
-from server.sockets.packets.reposition import RepositionPacket
-from server.sockets.packets.spawn_entity import SpawnEntityPacket
-from server.sockets.sockets_server import SocketsServer
+from server.network.packets import PacketType
+from server.network.packets.handshake import HandshakePacket
+from server.network.packets.movement import MovementPacket
+from server.network.packets.reposition import RepositionPacket
+from server.network.packets.spawn_entity import SpawnEntityPacket
+from server.network.sockets_server import SocketsServer
 
 
 class GameServer:

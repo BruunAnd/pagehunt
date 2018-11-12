@@ -1,6 +1,6 @@
 from server.game.player import Player
-from server.sockets.packets import PacketType
-from server.sockets.packets.packet import Packet
+from server.network.packets import PacketType
+from server.network.packets.packet import Packet
 
 
 class SpawnEntityPacket(Packet):

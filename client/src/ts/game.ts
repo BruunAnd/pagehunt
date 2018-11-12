@@ -126,8 +126,12 @@ export class Game {
 
         if (dir != Direction.None) {
             const moveSpeed = 10;
-            this.sendMovement(MovementController.getDegreesFromDirection(dir));
-            this.player.move(MovementController.getNewLocation(this.player.pos, dir, moveSpeed * dt), this.map);
+            const angle = MovementController.getDegreesFromDirection(dir);
+
+            if (angle != -1) {
+                this.sendMovement(angle);
+                this.player.move(MovementController.getNewLocation(this.player.pos, angle, moveSpeed * dt), this.map);
+            }
         }
     }
 

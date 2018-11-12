@@ -2,8 +2,8 @@ import { Direction } from "./game";
 import Vector2 from "./vector2";
 
 export default class MovementController {
-    public static getNewLocation(currentPos: Vector2, direction: Direction, distance: number): Vector2 {
-        return this.calculateNewPosition(currentPos, this.getDegreesFromDirection(direction), distance)
+    public static getNewLocation(currentPos: Vector2, angle: number, distance: number): Vector2 {
+        return this.calculateNewPosition(currentPos, angle, distance)
     }
 
     public static getDegreesFromDirection(direction: Direction): number {
@@ -34,7 +34,7 @@ export default class MovementController {
                     //Down & Right
                     return 45;
                 default:
-                //Invalid combination
+                    return -1;
             }
         }
     }

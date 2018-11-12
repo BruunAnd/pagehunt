@@ -3,10 +3,10 @@ import json
 
 import websockets
 
-from server.sockets.packets import PacketType
-from server.sockets.packets.handshake import HandshakePacket
-from server.sockets.packets.movement import MovementPacket
-from server.sockets.packets.packet import Packet
+from server.network.packets import PacketType
+from server.network.packets.handshake import HandshakePacket
+from server.network.packets.movement import MovementPacket
+from server.network.packets.packet import Packet
 
 
 class SocketsServer:
@@ -17,6 +17,7 @@ class SocketsServer:
 
     def listen(self, host='', port=4000):
         ws_server = websockets.serve(self.connected, host, port)
+        print(f'Listening on {host}:{port}')
 
         self.loop.run_until_complete(ws_server)
         self.loop.run_forever()
@@ -46,7 +47,6 @@ class SocketsServer:
 
     async def connected(self, client: websockets.WebSocketServerProtocol, path):
         self.clients.add(client)
-        print(f'Connection from {client.remote_address}')
 
         try:
             await self.handle_messages(client)
