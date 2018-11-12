@@ -2,10 +2,10 @@ import math
 
 
 class Entity:
-    def __init__(self, id, initialX, initialY):
+    def __init__(self, id, initial_x, initial_y):
         self.id = id
-        self.x = initialX
-        self.y = initialY
+        self.x = initial_x
+        self.y = initial_y
 
     def move_in_direction(self, direction):
         distance = 10

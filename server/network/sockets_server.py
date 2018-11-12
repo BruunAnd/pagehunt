@@ -16,6 +16,7 @@ class SocketsServer:
 
         # Initialize event handlers
         self.packet_event = AsyncEventHook()
+        self.player_disconnected_event = AsyncEventHook()
 
     def listen(self, host='', port=4000):
         ws_server = websockets.serve(self.connected, host, port)
@@ -56,6 +57,7 @@ class SocketsServer:
             await self.disconnect(client)
 
     async def disconnect(self, client):
-        await client.close()
         self.clients.remove(client)
 
+        await client.close()
+        await self.player_disconnected_event.fire(client)

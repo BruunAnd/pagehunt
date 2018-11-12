@@ -3,9 +3,9 @@ import random
 from server.game.player import Player
 from server.network.packets import PacketType
 from server.network.packets.handshake_packet import HandshakePacket
-from server.network.packets.movement_packet import MovementPacket
-from server.network.packets.reposition_packet import RepositionPacket
-from server.network.packets.spawn_entity_packet import SpawnEntityPacket
+from server.network.packets.entity.movement_packet import MovementPacket
+from server.network.packets.entity.reposition_packet import RepositionPacket
+from server.network.packets.entity.spawn_entity_packet import SpawnEntityPacket
 
 
 class PacketHandler:

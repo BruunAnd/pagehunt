@@ -1,7 +1,8 @@
 import Packet, { PacketType } from './packets/packet';
-import { EntityMovedPacket } from './packets/entitymoved';
-import { SpawnEntityPacket } from './packets/spawnentity';
-import {RepositionPacket} from "./packets/reposition";
+import { EntityMovedPacket } from './packets/entity-moved';
+import { SpawnEntityPacket } from './packets/spawn-entity';
+import { RepositionPacket } from './packets/reposition';
+import {RemoveEntityPacket} from "./packets/remove-entity";
 
 export default class NetworkClient {
     private socket: WebSocket;
@@ -24,16 +25,18 @@ export default class NetworkClient {
         console.log(`Error: ${event}`);
     }
 
-    private constructPacket(packetDict: any): Packet {
-        const type: PacketType = packetDict['type'];
+    private constructPacket(data: any): Packet {
+        const type: PacketType = data['type'];
 
         switch (type) {
             case PacketType.EntityMoved:
-                return new EntityMovedPacket(packetDict);
+                return new EntityMovedPacket(data);
             case PacketType.SpawnEntity:
-                return new SpawnEntityPacket(packetDict);
+                return new SpawnEntityPacket(data);
             case PacketType.Reposition:
-                return new RepositionPacket(packetDict);
+                return new RepositionPacket(data);
+            case PacketType.RemoveEntity:
+                return new RemoveEntityPacket(data);
         }
 
         return null;
