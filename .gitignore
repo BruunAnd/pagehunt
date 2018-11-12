@@ -5,3 +5,5 @@ client/.vs/
 \.vscode/
 
 \.vs/
+
+client/package-lock\.json
