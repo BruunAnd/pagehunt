@@ -35,14 +35,12 @@ export class Game {
     constructor(canvasId: string) {
         this.canvas = <HTMLCanvasElement>document.getElementById(canvasId);
         this.drawContext = this.canvas.getContext('2d');
-
         this.initNetworkClient();
-        this.camera = new Camera(new Vector2(0, 0));
         this.map = this.buildMap();//TODO: Get map from server
-
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        
+        this.camera = new Camera(new Vector2(0, 0), this.canvas);
+
         document.addEventListener('keydown', (event) => {
             Input.addKey(event.key);
         });
@@ -52,6 +50,8 @@ export class Game {
         window.addEventListener('resize', () => {
             this.canvas.width = window.innerWidth;
             this.canvas.height = window.innerHeight;
+            this.camera.onResize(this.canvas);
+            this.camera.setPosition(this.player.pos);
         });
 
         //Start the game loop
@@ -178,7 +178,7 @@ export class Game {
         this.drawContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.drawContext.fillRect(0, 0, this.canvas.width, this.canvas.height);
         for (let ent of this.map.getMapEntities()) {
-            ent.draw(this.drawContext);
+            ent.draw(this.drawContext, this.camera.getPosition());
         }
     }
 

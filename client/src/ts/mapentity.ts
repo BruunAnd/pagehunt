@@ -55,8 +55,8 @@ export default class MapEntity {
                (this.pos.y + 32) < position.y;
     }
 
-    public draw(drawContext: CanvasRenderingContext2D): void {
+    public draw(drawContext: CanvasRenderingContext2D, offset: Vector2): void {
         drawContext.fillStyle = '#FF0000';
-        drawContext.fillRect(this.pos.x, this.pos.y, 32, 32);
+        drawContext.fillRect(this.pos.x - offset.x, this.pos.y - offset.y, 32, 32);
     }
 }

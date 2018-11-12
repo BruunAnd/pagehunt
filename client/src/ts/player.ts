@@ -39,9 +39,8 @@ export default class Player extends MapEntity {
         this.pos = newPos;
     }
 
-    public draw(drawContext: CanvasRenderingContext2D): void {
+    public draw(drawContext: CanvasRenderingContext2D, offset: Vector2): void {
         drawContext.fillStyle = '#00FF00';
-        drawContext.fillRect(this.pos.x, this.pos.y, 32, 32);
-
+        drawContext.fillRect(this.pos.x - offset.x, this.pos.y - offset.y, 32, 32);
     }
 }
