@@ -11,7 +11,6 @@ import MapEntity, {EntityType} from "./mapentity";
 import { MovementPacket } from "./packets/movement";
 import { RepositionPacket } from "./packets/reposition";
 import Camera from "./camera";
-import Vector2D from "./vector2new";
 
 export enum Direction {
     None = 0,
@@ -31,14 +30,14 @@ export class Game {
     enableInput: boolean = false;
     networkClient: NetworkClient;
     movementController: MovementController;
-    camera: Camera
+    camera: Camera;
     
     constructor(canvasId: string) {
         this.canvas = <HTMLCanvasElement>document.getElementById(canvasId);
         this.drawContext = this.canvas.getContext('2d');
         this.tickInterval = setInterval(() => this.gameLoop(), 16);
         this.initNetworkClient();
-        this.camera = new Camera(new Vector2D(0, 0));
+        this.camera = new Camera(new Vector2(0, 0));
         this.map = this.buildMap();//TODO: Get map from server
 
         this.canvas.width = window.innerWidth;
@@ -93,7 +92,7 @@ export class Game {
         this.camera.tick();
     }
 
-    private checkMovement(dt: number) {
+    private checkMovement(dt: number): void {
         let dir: Direction = Direction.None;
 
         if (Input.getKey("w")) {
@@ -131,15 +130,16 @@ export class Game {
             if (angle != -1) {
                 this.sendMovement(angle);
                 this.player.move(MovementController.getNewLocation(this.player.pos, angle, moveSpeed * dt), this.map);
+                this.camera.setPosition(this.player.pos);
             }
         }
     }
 
-    private sendMovement(direction: number) {
+    private sendMovement(direction: number): void {
         this.networkClient.sendPacket(new MovementPacket(direction));
     }
 
-    private handleSpawnEntity(packet: SpawnEntityPacket) {
+    private handleSpawnEntity(packet: SpawnEntityPacket): void {
         const position = new Vector2(packet.x, packet.y);
 
         if (packet.isSelf) {
@@ -151,7 +151,7 @@ export class Game {
         }
     }
 
-    private handleReposition(packet: RepositionPacket) {
+    private handleReposition(packet: RepositionPacket): void {
         this.map.getMapEntities().forEach(function (element: MapEntity) {
             if (element.id === packet.id) {
                 element.pos = new Vector2(packet.x, packet.y);

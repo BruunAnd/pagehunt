@@ -20,7 +20,7 @@ export default class NetworkClient {
         this.socket.send(JSON.stringify(packet.dictify()));
     }
 
-    private onError(event): any {
+    private onError(event): void {
         console.log(`Error: ${event}`);
     }
 
@@ -39,15 +39,15 @@ export default class NetworkClient {
         return null;
     }
 
-    private onMessage(event): any {
+    private onMessage(event): void {
         this.packetCallback(this.constructPacket(JSON.parse(event.data)));
     }
 
-    private onOpen(): any {
+    private onOpen(): void {
         this.connectedCallback();
     }
 
-    private onClose(): any {
+    private onClose(): void {
         console.log('Connection closed');
     }
 }

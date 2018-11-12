@@ -9,7 +9,7 @@ export default class Map {
         this.mapSize = size;
     }
 
-    public addMapEntities(entities: MapEntity[]) {
+    public addMapEntities(entities: MapEntity[]): void {
         for (const ent of entities) {
             this.mapEntities.push(ent);
         }

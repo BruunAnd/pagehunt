@@ -42,16 +42,13 @@ export default class MapEntity {
     }
 
     public occupiesPosition(position: Vector2): boolean {
-        if (this.pos.x < (position.x + 32) &&
-           (this.pos.x + 32) > position.x  &&
-           this.pos.y > (position.y + 32)  &&
-           (this.pos.y + 32) < position.y) {
-               return true;
-        }
-        return false;
+        return this.pos.x < (position.x + 32) &&
+               (this.pos.x + 32) > position.x &&
+               this.pos.y > (position.y + 32) &&
+               (this.pos.y + 32) < position.y;
     }
 
-    public draw(drawContext: CanvasRenderingContext2D) {
+    public draw(drawContext: CanvasRenderingContext2D): void {
         drawContext.fillStyle = '#FF0000';
         drawContext.fillRect(this.pos.x, this.pos.y, 32, 32);
     }

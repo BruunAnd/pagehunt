@@ -18,7 +18,7 @@ export default class Player extends MapEntity {
         
     }
 
-    public move(newPos: Vector2, map: Map) {
+    public move(newPos: Vector2, map: Map): void {
         //Check if we are trying to move out of the map
         if (newPos.x < 0                   ||
            (newPos.x + 32) > map.mapSize.x ||
@@ -39,7 +39,7 @@ export default class Player extends MapEntity {
         this.pos = newPos;
     }
 
-    public draw(drawContext: CanvasRenderingContext2D) {
+    public draw(drawContext: CanvasRenderingContext2D): void {
         drawContext.fillStyle = '#00FF00';
         drawContext.fillRect(this.pos.x, this.pos.y, 32, 32);
     }

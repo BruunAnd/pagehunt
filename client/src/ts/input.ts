@@ -1,5 +1,5 @@
 export default class Input {
-    static input: string[] = []
+    static input: string[] = [];
 
     public static addKey(key: string): void {
         const index: number = this.input.indexOf(key);
@@ -17,9 +17,6 @@ export default class Input {
 
     public static getKey(key: string): boolean {
         const index: number = this.input.indexOf(key);
-        if (index > -1) {
-            return true;
-        }
-        return false;
+        return index > -1;
     }
 }
