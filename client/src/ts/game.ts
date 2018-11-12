@@ -5,12 +5,13 @@ import Vector2 from "./vector2";
 import NetworkClient from './network';
 import Packet, {PacketType} from "./packets/packet";
 import {HandshakePacket} from "./packets/handshake";
-import {SpawnEntityPacket} from "./packets/spawnentity";
+import {SpawnEntityPacket} from "./packets/spawn-entity";
 import MovementController from "./movement";
-import MapEntity, {EntityType} from "./mapentity";
+import MapEntity, {EntityType} from "./map-entity";
 import { MovementPacket } from "./packets/movement";
 import { RepositionPacket } from "./packets/reposition";
 import Camera from "./camera";
+import {RemoveEntityPacket} from "./packets/remove-entity";
 
 export enum Direction {
     None = 0,
@@ -162,10 +163,15 @@ export class Game {
         });
     }
 
+    private handleRemoveEntity(packet: RemoveEntityPacket) {
+        console.log(`remove ${packet.id}`);
+    }
+
     public packetReceived(packet: Packet): void {
         switch (packet.getType()) {
             case PacketType.SpawnEntity: return this.handleSpawnEntity(<SpawnEntityPacket> packet);
             case PacketType.Reposition: return this.handleReposition(<RepositionPacket> packet);
+            case PacketType.RemoveEntity: return this.handleRemoveEntity(<RemoveEntityPacket> packet);
         }
     }
 

@@ -8,5 +8,6 @@ export enum PacketType {
     EntityMoved,
     SpawnEntity,
     Movement,
-    Reposition
+    Reposition,
+    RemoveEntity
 }

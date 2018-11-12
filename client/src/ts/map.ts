@@ -1,5 +1,5 @@
-import Vector2 from "./vector2";
-import MapEntity from "./mapentity";
+import Vector2 from './vector2';
+import MapEntity from './map-entity';
 
 export default class Map {
     mapSize: Vector2;

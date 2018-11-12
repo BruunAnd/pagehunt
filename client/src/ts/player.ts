@@ -1,4 +1,4 @@
-import MapEntity, { EntityType } from "./mapentity";
+import MapEntity, { EntityType } from "./map-entity";
 import Vector2 from "./vector2";
 import Map from "./map";
 

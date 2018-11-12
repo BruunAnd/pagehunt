@@ -3,17 +3,20 @@ import json
 
 import websockets
 
-from server.network.packets import PacketType
-from server.network.packets.handshake import HandshakePacket
-from server.network.packets.movement import MovementPacket
-from server.network.packets.packet import Packet
+from server.event_hook import AsyncEventHook
+from server.network.packets.packet_base import Packet
+from server.network.packets.utility import construct_packet
 
 
 class SocketsServer:
-    def __init__(self, packet_callback):
+
+    def __init__(self):
         self.clients = set()
         self.loop = asyncio.get_event_loop()
-        self.packet_callback = packet_callback
+
+        # Initialize event handlers
+        self.packet_event = AsyncEventHook()
+        self.player_disconnected_event = AsyncEventHook()
 
     def listen(self, host='', port=4000):
         ws_server = websockets.serve(self.connected, host, port)
@@ -38,9 +41,9 @@ class SocketsServer:
 
     async def handle_messages(self, client):
         while True:
-            packet = self.construct_packet(json.loads(await client.recv()))
+            packet = construct_packet(json.loads(await client.recv()))
 
-            await self.packet_callback(client, packet)
+            await self.packet_event.fire(client, packet)
 
     async def send_packet(self, client, packet: Packet):
         await client.send(json.dumps(packet.dictify()))
@@ -54,10 +57,7 @@ class SocketsServer:
             await self.disconnect(client)
 
     async def disconnect(self, client):
-        await client.close()
         self.clients.remove(client)
 
-    def construct_packet(self, data):
-        # Highly readable switch using a dictionary
-        return {PacketType.Handshake: HandshakePacket,
-                PacketType.Movement: MovementPacket}[data['type']](data)
+        await client.close()
+        await self.player_disconnected_event.fire(client)
