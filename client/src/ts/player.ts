@@ -28,15 +28,37 @@ export default class Player extends MapEntity {
                 return;
         }
 
+        let canMove: boolean = true;
+
         //Preliminary collision checking
         for (let ent of map.getMapEntities()) {
             if (ent.occupiesPosition(newPos)) {
+                if (ent.id == this.id)
+                    //Don't check our own collision :D
+                    continue;
                 //Position is occupied, cannot move!
-                return;
+                console.log(`${this.name} collided with ${ent.name}`);
+                canMove = this.onCollision(ent);
             }
         }
-        
-        this.pos = newPos;
+
+        if (canMove) {
+            this.pos = newPos;
+        }
+    }
+
+    private onCollision(other: MapEntity): boolean {
+        switch (other.type) {
+            case EntityType.Page:
+                //Collect and move
+                return true;
+            case EntityType.Slender:
+                //Death
+                return true;
+            default:
+                //Blocked
+                return false;
+        }
     }
 
     public draw(drawContext: CanvasRenderingContext2D, offset: Vector2): void {
