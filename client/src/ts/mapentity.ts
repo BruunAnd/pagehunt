@@ -9,10 +9,11 @@ export enum EntityType {
 }
 
 export default class MapEntity {
-    public id: number;
+    private picture: HTMLImageElement = null;
+    readonly id: number;
+    readonly name: string;
+    readonly type: EntityType;
     public pos: Vector2 = new Vector2(0, 0);
-    name: string;
-    type: EntityType;
 
     constructor(id: number, type: EntityType, name?: string, pos?: Vector2) {
         this.id = id;
@@ -32,6 +33,12 @@ export default class MapEntity {
             else {
                 this.name = type;
             }
+
+            let image = new Image();
+            image.addEventListener('load', () => {
+                this.picture = image;
+            });
+            image.src = "/client/graphics/" + type + ".png";
         }
         
         if (pos) {

@@ -35,7 +35,7 @@ export class Game {
     constructor(canvasId: string) {
         this.canvas = <HTMLCanvasElement>document.getElementById(canvasId);
         this.drawContext = this.canvas.getContext('2d');
-        this.tickInterval = setInterval(() => this.gameLoop(), 16);
+
         this.initNetworkClient();
         this.camera = new Camera(new Vector2(0, 0));
         this.map = this.buildMap();//TODO: Get map from server
@@ -54,6 +54,8 @@ export class Game {
             this.canvas.height = window.innerHeight;
         });
 
+        //Start the game loop
+        this.tickInterval = setInterval(() => this.gameLoop(), 16);
         this.enableInput = true;
     }
 
@@ -145,6 +147,7 @@ export class Game {
         if (packet.isSelf) {
             this.player = this.buildPlayer(packet.id, packet.name, position);
             this.map.addMapEntities([this.player]);
+            this.camera.setPosition(this.player.pos);
         } else {
             const entity = new MapEntity(packet.id, EntityType.NetworkPlayer, packet.name, position);
             this.map.addMapEntities([entity]);

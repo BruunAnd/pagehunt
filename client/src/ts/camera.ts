@@ -14,13 +14,15 @@ export default class Camera {
     }
 
     public tick(): void {
-        const dist = this.targetPosition.sub(this.position).length();
+        if (this.targetPosition && this.position != this.targetPosition) {
+            const dist = this.targetPosition.sub(this.position).length();
 
-        if (dist < this.cameraMovementSpeed) {
-            this.position = this.targetPosition;
-        } else {
-            const dir = this.targetPosition.sub(this.position).normalize().multiply(this.cameraMovementSpeed);
-            this.position = this.position.add(dir);
+            if (dist < this.cameraMovementSpeed) {
+                this.position = this.targetPosition;
+            } else {
+                const dir = this.targetPosition.sub(this.position).normalize().multiply(this.cameraMovementSpeed);
+                this.position = this.position.add(dir);
+            }
         }
     }
 }
