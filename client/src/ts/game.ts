@@ -164,7 +164,7 @@ export class Game {
     }
 
     private handleRemoveEntity(packet: RemoveEntityPacket) {
-        console.log(`remove ${packet.id}`);
+        this.map.removeMapEntityByID(packet.id);
     }
 
     public packetReceived(packet: Packet): void {

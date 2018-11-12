@@ -19,7 +19,10 @@ export default class MapEntity {
         this.id = id;
 
         if (type == EntityType.LocalPlayer || type == EntityType.NetworkPlayer) {
-            if (!name) {
+            if (name) {
+                this.name = name;
+            }
+            else{
                 this.name = "Unknown Player";
             }
         }
@@ -33,13 +36,13 @@ export default class MapEntity {
             else {
                 this.name = type;
             }
-
-            let image = new Image();
-            image.addEventListener('load', () => {
-                this.picture = image;
-            });
-            image.src = "/client/graphics/" + type + ".png";
         }
+
+        let image = new Image();
+        image.addEventListener('load', () => {
+            this.picture = image;
+        });
+        image.src = "/client/graphics/" + type + ".png";
         
         if (pos) {
             this.pos = pos;
