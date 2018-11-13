@@ -19,6 +19,10 @@ export default class Vector2 {
         return "Vector2( " + this.x + ", " + this.y + " )";
     }
 
+    public equals(other: Vector2): boolean {
+        return this.x == other.x && this.y == other.y;
+    }
+
     public copy(): Vector2 {
         return new Vector2(this.x, this.y)
     }

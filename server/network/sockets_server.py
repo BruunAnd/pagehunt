@@ -9,7 +9,6 @@ from server.network.packets.utility import construct_packet
 
 
 class SocketsServer:
-
     def __init__(self):
         self.clients = set()
         self.loop = asyncio.get_event_loop()
