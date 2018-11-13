@@ -30,7 +30,6 @@ export class Game {
     tickInterval: number;
     enableInput: boolean = false;
     networkClient: NetworkClient;
-    movementController: MovementController;
     camera: Camera;
     
     constructor(canvasId: string) {

@@ -13,6 +13,8 @@ export default class MapEntity {
     readonly id: number;
     readonly name: string;
     readonly type: EntityType;
+    readonly width: number = 32;
+    readonly height: number = 32;
     public pos: Vector2 = new Vector2(0, 0);
 
     constructor(id: number, type: EntityType, name?: string, pos?: Vector2) {
@@ -52,15 +54,15 @@ export default class MapEntity {
     }
 
     public occupiesPosition(position: Vector2): boolean {
-        return this.pos.x < (position.x + 32) &&
-               (this.pos.x + 32) > position.x &&
-               this.pos.y > (position.y + 32) &&
-               (this.pos.y + 32) < position.y;
+        const a = Math.min(this.pos.x + this.width, position.x + this.width) - Math.max(this.pos.x, position.x);
+        const b = Math.min(this.pos.y + this.height, position.y + this.height) - Math.max(this.pos.y, position.y);
+        return (a >= 0) && (b >= 0);
+
     }
 
     public draw(drawContext: CanvasRenderingContext2D, offset: Vector2): void {
         drawContext.fillStyle = '#FF0000';
-        drawContext.fillRect(this.pos.x - offset.x, this.pos.y - offset.y, 32, 32);
+        drawContext.fillRect(this.pos.x - offset.x, this.pos.y - offset.y, this.width, this.height);
         drawContext.fillStyle = '#FFFFFF';
         drawContext.fillText(this.name, this.pos.x - offset.x, (this.pos.y - 8) - offset.y);
     }
