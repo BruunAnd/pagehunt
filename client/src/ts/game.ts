@@ -4,22 +4,12 @@ import Map from "./map";
 import Vector2 from "./vector2";
 import NetworkClient from './network';
 import Packet, {PacketType} from "./packets/packet";
-import {HandshakePacket} from "./packets/handshake";
-import {SpawnEntityPacket} from "./packets/spawn-entity";
-import MovementController from "./movement";
-import MapEntity, {EntityType} from "./map-entity";
-import { MovementPacket } from "./packets/movement";
+import { HandshakePacket } from "./packets/handshake";
+import { SpawnEntityPacket } from "./packets/spawn-entity";
+import MapEntity, { EntityType } from "./map-entity";
 import { RepositionPacket } from "./packets/reposition";
 import Camera from "./camera";
-import {RemoveEntityPacket} from "./packets/remove-entity";
-
-export enum Direction {
-    None = 0,
-    Up = 1 << 0,    // 0001 -- the bitshift is unnecessary, but done for consistency
-    Down = 1 << 1,  // 0010
-    Left = 1 << 2,  // 0100
-    Right = 1 << 3, // 1000
-}
+import { RemoveEntityPacket } from "./packets/remove-entity";
 
 export class Game {
     canvas: HTMLCanvasElement;
@@ -31,15 +21,16 @@ export class Game {
     enableInput: boolean = false;
     networkClient: NetworkClient;
     camera: Camera;
+    render;
     
     constructor(canvasId: string) {
         this.canvas = <HTMLCanvasElement>document.getElementById(canvasId);
-        this.drawContext = this.canvas.getContext('2d');
-        this.initNetworkClient();
-        this.map = this.buildMap();//TODO: Get map from server
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
+        this.drawContext = this.canvas.getContext('2d');
         this.camera = new Camera(new Vector2(0, 0), this.canvas);
+        this.initNetworkClient();
+        this.map = this.buildMap();//TODO: Get map from server
 
         document.addEventListener('keydown', (event) => {
             Input.addKey(event.key);
@@ -55,8 +46,18 @@ export class Game {
         });
 
         //Start the game loop
-        this.tickInterval = setInterval(() => this.gameLoop(), 16);
+        this.tickInterval = setInterval(() => this.tick(), 16);
         this.enableInput = true;
+        this.render = () => {
+            this.drawContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+            this.drawContext.fillStyle = '#000000';
+            this.drawContext.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            requestAnimationFrame(this.render);
+        };
+
+        this.render();
     }
 
     private initNetworkClient(): void {
@@ -71,75 +72,22 @@ export class Game {
 
     private buildPlayer(id: number, name: string, pos?: Vector2): Player {
         if (pos) {
-            return new Player(id, name, pos);
+            return new Player(this, id, name, pos);
         }
         else {
-            return new Player(id, name);
+            return new Player(this, id, name);
         }
     }
-    
-    private gameLoop(): void {
+
+    private tick(): void {
         let tickTime = Date.now();
         let dt = ((Date.now() - this.lastTickTime) / 1000) * 20;
         this.lastTickTime = tickTime;
-        this.tick(dt);
-        this.draw();
-    }
 
-    private tick(dt: number): void {
-        if (this.enableInput) {
-            this.checkMovement(dt);
-        }
-
-        this.camera.tick();
-    }
-
-    private checkMovement(dt: number): void {
-        let dir: Direction = Direction.None;
-
-        if (Input.getKey("w")) {
-            dir = Direction.Up;
-        }
-        if (Input.getKey("s")) {
-            if (dir == Direction.None) {
-                dir = Direction.Down;
-            }
-            else {
-                dir = dir | Direction.Down;
-            }
-        }
-        if (Input.getKey("a")) {
-            if (dir == Direction.None) {
-                dir = Direction.Left;
-            }
-            else {
-                dir = dir | Direction.Left;
-            }
-        }
-        if (Input.getKey("d")) {
-            if (dir == Direction.None) {
-                dir = Direction.Right;
-            }
-            else {
-                dir = dir | Direction.Right;
-            }
-        }
-
-        if (dir != Direction.None) {
-            const moveSpeed = 10;
-            const angle = MovementController.getDegreesFromDirection(dir);
-
-            if (angle != -1) {
-                const newLocation = MovementController.getNewLocation(this.player.pos, angle, moveSpeed * dt);
-                const actualNewLocation = this.player.move(newLocation, this.map);
-                this.sendMovement(actualNewLocation);
-                this.camera.setPosition(this.player.pos);
-            }
-        }
-    }
-
-    private sendMovement(newLoc: Vector2): void {
-        this.networkClient.sendPacket(new MovementPacket(newLoc));
+        if (this.player)
+            this.player.tick(dt);
+        if (this.camera)
+            this.camera.tick(dt);
     }
 
     private handleSpawnEntity(packet: SpawnEntityPacket): void {
@@ -150,7 +98,7 @@ export class Game {
             this.map.addMapEntities([this.player]);
             this.camera.setPosition(this.player.pos);
         } else {
-            const entity = new MapEntity(packet.id, EntityType.NetworkPlayer, packet.name, position);
+            const entity = new MapEntity(this, packet.id, EntityType.NetworkPlayer, packet.name, position);
             this.map.addMapEntities([entity]);
         }
     }
@@ -177,22 +125,6 @@ export class Game {
 
     public onConnected(): void {
         this.networkClient.sendPacket(new HandshakePacket('Anders'));
-    }
-
-    public draw(): void {
-        this.drawContext.fillStyle = '#000000';
-        this.drawContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.drawContext.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        this.drawContext.fill();
-
-        for (let ent of this.map.getMapEntities()) {
-            ent.draw(this.drawContext, this.camera.getPosition());
-        }
-    }
-
-    public kill(): void {
-        console.log('Kill');
-        clearInterval(this.tickInterval);
     }
 }
 

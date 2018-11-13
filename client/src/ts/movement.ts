@@ -1,4 +1,4 @@
-import { Direction } from "./game";
+import { Direction } from "./player";
 import Vector2 from "./vector2";
 
 export default class MovementController {

@@ -14,15 +14,7 @@ export default class Camera {
         this.sizeModifier = Math.max(canvas.width, canvas.height) / 10;
     }
 
-    public setPosition(position: Vector2): void {
-        this.targetPosition = new Vector2(position.x - (this.screenSize.x / 2), position.y - (this.screenSize.y / 2));
-    }
-
-    public getPosition(): Vector2 {
-        return this.position;
-    }
-
-    public tick(): void {
+    public tick(dt: number): void {
         if (this.targetPosition && this.position != this.targetPosition) {
             const dist = this.targetPosition.sub(this.position).length();
 
@@ -30,11 +22,19 @@ export default class Camera {
                 this.position = this.targetPosition;
             }
             else {
-                const speed = 10 * (dist / 200);
+                const speed = (10 * (dist / 200) * dt);
                 const dir = this.targetPosition.sub(this.position).normalize().multiply(speed);
                 this.position = this.position.add(dir);
             }
         }
+    }
+
+    public setPosition(position: Vector2): void {
+        this.targetPosition = new Vector2(position.x - (this.screenSize.x / 2), position.y - (this.screenSize.y / 2));
+    }
+
+    public getPosition(): Vector2 {
+        return this.position;
     }
 
     public onResize(canvas: HTMLCanvasElement){

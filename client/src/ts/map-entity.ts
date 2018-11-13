@@ -1,4 +1,5 @@
 import Vector2 from "./vector2";
+import { Game } from "./game";
 
 export enum EntityType {
     LocalPlayer = "LPlayer",
@@ -11,14 +12,17 @@ export enum EntityType {
 
 export default class MapEntity {
     private picture: HTMLImageElement = null;
+    readonly game;
     readonly id: number;
     readonly name: string;
     readonly type: EntityType;
     readonly width: number = 32;
     readonly height: number = 32;
+    protected render;
     public pos: Vector2 = new Vector2(0, 0);
 
-    constructor(id: number, type: EntityType, name?: string, pos?: Vector2) {
+    constructor(game: Game, id: number, type: EntityType, name?: string, pos?: Vector2) {
+        this.game = game;
         this.id = id;
 
         if (type == EntityType.LocalPlayer || type == EntityType.NetworkPlayer) {
@@ -52,6 +56,18 @@ export default class MapEntity {
         }
 
         console.log(`Spawned entity '${name}:${this.id}' at position 'x:${this.pos.x}, y:${this.pos.y}'`);
+        this.render = () => {
+            this.game.drawContext.beginPath();
+            this.game.drawContext.fillStyle = '#FF0000';
+            this.game.drawContext.fillRect(this.pos.x - this.game.camera.getPosition().x, this.pos.y - this.game.camera.getPosition().y, this.width, this.height);
+            this.game.drawContext.fillStyle = '#FFFFFF';
+            this.game.drawContext.fillText(this.name, this.pos.x - this.game.camera.getPosition().x, (this.pos.y - 8) - this.game.camera.getPosition().y);
+            this.game.drawContext.stroke();
+            this.game.drawContext.closePath();
+
+            requestAnimationFrame(this.render);
+        };
+        this.render();
     }
 
     public occupiesPosition(position: Vector2): boolean {
@@ -59,15 +75,5 @@ export default class MapEntity {
         const b = Math.min(this.pos.y + this.height, position.y + this.height) - Math.max(this.pos.y, position.y);
         return (a >= 0) && (b >= 0);
 
-    }
-
-    public draw(drawContext: CanvasRenderingContext2D, offset: Vector2): void {
-        drawContext.beginPath();
-        drawContext.fillStyle = '#FF0000';
-        drawContext.fillRect(this.pos.x - offset.x, this.pos.y - offset.y, this.width, this.height);
-        drawContext.fillStyle = '#FFFFFF';
-        drawContext.fillText(this.name, this.pos.x - offset.x, (this.pos.y - 8) - offset.y);
-        drawContext.stroke();
-        drawContext.closePath();
     }
 }

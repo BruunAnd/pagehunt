@@ -1,34 +1,51 @@
 import MapEntity, { EntityType } from "./map-entity";
 import Vector2 from "./vector2";
 import Map from "./map";
+import Input from "./input";
+import MovementController from "./movement";
+import { Game } from "./game";
+import { MovementPacket } from "./packets/movement";
+
+export enum Direction {
+    None = 0,
+    Up = 1 << 0,    // 0001 -- the bitshift is unnecessary, but done for consistency
+    Down = 1 << 1,  // 0010
+    Left = 1 << 2,  // 0100
+    Right = 1 << 3, // 1000
+}
 
 export default class Player extends MapEntity {
     light: number;
-    lightMask: HTMLImageElement;
 
-    constructor(id: number, name?: string, pos?: Vector2) {
+    constructor(game: Game, id: number, name?: string, pos?: Vector2) {
         if (name) {
             if (pos) {
-                super(id, EntityType.LocalPlayer, name, pos);
+                super(game, id, EntityType.LocalPlayer, name, pos);
             }
             else {
-                super(id, EntityType.LocalPlayer, name);
+                super(game, id, EntityType.LocalPlayer, name);
             }
         }
         else {
-            super(id, EntityType.LocalPlayer);
+            super(game, id, EntityType.LocalPlayer);
         }
         this.light = 100;
 
-        let image = new Image();
-        image.addEventListener('load', () => {
-            this.lightMask = image;
-        });
-        image.src = "/client/graphics/light_mask.png";
+        this.render = () => {
+            this.game.drawContext.beginPath();
+            this.game.drawContext.fillStyle = '#00FF00';
+            this.game.drawContext.fillRect(this.pos.x - this.game.camera.getPosition().x, this.pos.y - this.game.camera.getPosition().y, this.width, this.height);
+            this.game.drawContext.fillStyle = '#FFFFFF';
+            this.game.drawContext.fillText(this.name, this.pos.x - this.game.camera.getPosition().x, (this.pos.y - 8) - this.game.camera.getPosition().y);
+            this.game.drawContext.stroke();
+            this.game.drawContext.closePath();
 
-        if (pos) {
-            this.pos = pos;
+            requestAnimationFrame(this.render);
         }
+    }
+
+    public tick(dt: number): void {
+        this.checkMovement(dt);
     }
 
     public move(newPos: Vector2, map: Map): Vector2 {
@@ -96,20 +113,47 @@ export default class Player extends MapEntity {
         }
     }
 
-    public draw(drawContext: CanvasRenderingContext2D, offset: Vector2): void {
-        drawContext.beginPath();
-        drawContext.arc(this.pos.x - offset.x, this.pos.y - offset.y, this.light, 0, Math.PI * 2, false);
-        drawContext.clip();
-        drawContext.fillStyle = '#FFEEAA';
-        drawContext.fillRect((this.pos.x - offset.x) - 100, (this.pos.y - offset.y) - 100, (this.pos.x - offset.x) + 100, (this.pos.y - offset.y) + 100);
-        drawContext.stroke();
-        drawContext.closePath();
-        drawContext.beginPath();
-        drawContext.fillStyle = '#00FF00';
-        drawContext.fillRect(this.pos.x - offset.x, this.pos.y - offset.y, this.width, this.height);
-        drawContext.fillStyle = '#FFFFFF';
-        drawContext.fillText(this.name, this.pos.x - offset.x, (this.pos.y - 8) - offset.y);
-        drawContext.stroke();
-        drawContext.closePath();
+    private checkMovement(dt: number): void {
+        let dir: Direction = Direction.None;
+
+        if (Input.getKey("w")) {
+            dir = Direction.Up;
+        }
+        if (Input.getKey("s")) {
+            if (dir == Direction.None) {
+                dir = Direction.Down;
+            }
+            else {
+                dir = dir | Direction.Down;
+            }
+        }
+        if (Input.getKey("a")) {
+            if (dir == Direction.None) {
+                dir = Direction.Left;
+            }
+            else {
+                dir = dir | Direction.Left;
+            }
+        }
+        if (Input.getKey("d")) {
+            if (dir == Direction.None) {
+                dir = Direction.Right;
+            }
+            else {
+                dir = dir | Direction.Right;
+            }
+        }
+
+        if (dir != Direction.None) {
+            const moveSpeed = 10;
+            const angle = MovementController.getDegreesFromDirection(dir);
+
+            if (angle != -1) {
+                const newLocation = MovementController.getNewLocation(this.pos, angle, moveSpeed * dt);
+                const actualNewLocation = this.game.player.move(newLocation, this.game.map);
+                this.game.networkClient.sendPacket(new MovementPacket(actualNewLocation));
+                this.game.camera.setPosition(this.game.player.pos);
+            }
+        }
     }
 }
