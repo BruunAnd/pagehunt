@@ -1,6 +1,6 @@
 import Player from "./player";
 import Input from "./input";
-import Map from "./map";
+import GameMap from "./game-map";
 import Vector2 from "./vector2";
 import NetworkClient from './network';
 import Packet, {PacketType} from "./packets/packet";
@@ -14,7 +14,7 @@ import { RemoveEntityPacket } from "./packets/remove-entity";
 export class Game {
     canvas: HTMLCanvasElement;
     player: Player;
-    map: Map;
+    map: GameMap;
     drawContext: CanvasRenderingContext2D;
     lastTickTime: number = Date.now();
     tickInterval: number;
@@ -65,9 +65,9 @@ export class Game {
             (packet: Packet) => this.packetReceived(packet), () => this.onConnected());
     }
 
-    private buildMap(): Map {
+    private buildMap(): GameMap {
         //Receive map from server
-        return new Map(new Vector2(2000, 2000));
+        return new GameMap(new Vector2(2000, 2000));
     }
 
     private buildPlayer(id: number, name: string, pos?: Vector2): Player {

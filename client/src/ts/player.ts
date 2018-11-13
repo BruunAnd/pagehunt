@@ -1,6 +1,6 @@
 import MapEntity, { EntityType } from "./map-entity";
 import Vector2 from "./vector2";
-import Map from "./map";
+import GameMap from "./game-map";
 import Input from "./input";
 import MovementController from "./movement";
 import { Game } from "./game";
@@ -48,7 +48,7 @@ export default class Player extends MapEntity {
         this.checkMovement(dt);
     }
 
-    public move(newPos: Vector2, map: Map): Vector2 {
+    public move(newPos: Vector2, map: GameMap): Vector2 {
         let correctX: number = newPos.x;
         let correctY: number = newPos.y;
         //Check if we are trying to move out of the map
