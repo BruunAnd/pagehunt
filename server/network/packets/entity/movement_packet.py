@@ -4,9 +4,10 @@ from server.network.packets.packet_base import Packet
 
 class MovementPacket(Packet):
     def __init__(self, data):
-        if 'direction' not in data:
+        if 'x' not in data or 'y' not in data:
             print(data)
-        self.direction = data['direction']
+        self.x = data['x']
+        self.y = data['y']
 
     def dictify(self):
         pass

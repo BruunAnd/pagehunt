@@ -18,15 +18,34 @@ export default class Player extends MapEntity {
         
     }
 
-    public move(newPos: Vector2, map: Map): void {
+    public move(newPos: Vector2, map: Map): Vector2 {
+        let correctX: number = newPos.x;
+        let correctY: number = newPos.y;
         //Check if we are trying to move out of the map
-        if (newPos.x < 0                   ||
-           (newPos.x + 32) > map.mapSize.x ||
-           newPos.y < 0                    ||
-           (newPos.y + 32) > map.mapSize.y) {
-                //newPos is outside map boundries
-                return;
+        if (newPos.x < 0){
+            //newPos is to the left of the map boundary
+            correctX = 1;
         }
+        if (newPos.y < 0){
+            //newPos is above the map boundary
+            correctY = 1;
+        }
+        if ((newPos.x + this.width) > map.mapSize.x){
+            //newPos is to the right of the map boundary
+            correctX = map.mapSize.x - (this.width + 1);
+        }
+        if ((newPos.y + this.height) > map.mapSize.y) {
+            //newPos is below the map boundary
+            correctY = map.mapSize.y - (this.height + 1);
+        }
+
+        let correctPos = new Vector2(correctX, correctY);
+        if (!newPos.equals(correctPos)) {
+            console.log("Collided with map boundary");
+            this.pos = correctPos;
+            return correctPos;
+        }
+
 
         let canMove: boolean = true;
 
@@ -44,7 +63,10 @@ export default class Player extends MapEntity {
 
         if (canMove) {
             this.pos = newPos;
+            return newPos;
         }
+
+        return this.pos;
     }
 
     private onCollision(other: MapEntity): boolean {

@@ -130,15 +130,16 @@ export class Game {
             const angle = MovementController.getDegreesFromDirection(dir);
 
             if (angle != -1) {
-                this.sendMovement(angle);
-                this.player.move(MovementController.getNewLocation(this.player.pos, angle, moveSpeed * dt), this.map);
+                const newLocation = MovementController.getNewLocation(this.player.pos, angle, moveSpeed * dt);
+                const actualNewLocation = this.player.move(newLocation, this.map);
+                this.sendMovement(actualNewLocation);
                 this.camera.setPosition(this.player.pos);
             }
         }
     }
 
-    private sendMovement(direction: number): void {
-        this.networkClient.sendPacket(new MovementPacket(direction));
+    private sendMovement(newLoc: Vector2): void {
+        this.networkClient.sendPacket(new MovementPacket(newLoc));
     }
 
     private handleSpawnEntity(packet: SpawnEntityPacket): void {
@@ -155,9 +156,9 @@ export class Game {
     }
 
     private handleReposition(packet: RepositionPacket): void {
-        this.map.getMapEntities().forEach(function (element: MapEntity) {
-            if (element.id === packet.id) {
-                element.pos = new Vector2(packet.x, packet.y);
+        this.map.getMapEntities().forEach(function (ent: MapEntity) {
+            if (ent.id === packet.id) {
+                ent.pos = new Vector2(packet.x, packet.y);
             }
         });
     }
