@@ -183,6 +183,8 @@ export class Game {
         this.drawContext.fillStyle = '#000000';
         this.drawContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.drawContext.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        this.drawContext.fill();
+
         for (let ent of this.map.getMapEntities()) {
             ent.draw(this.drawContext, this.camera.getPosition());
         }

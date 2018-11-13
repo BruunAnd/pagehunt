@@ -5,6 +5,7 @@ export enum EntityType {
     NetworkPlayer = "NPlayer",
     Slender = "Slender",
     Page = "Page",
+    Light = "Light",
     Tree = "Tree"
 }
 
@@ -61,9 +62,12 @@ export default class MapEntity {
     }
 
     public draw(drawContext: CanvasRenderingContext2D, offset: Vector2): void {
+        drawContext.beginPath();
         drawContext.fillStyle = '#FF0000';
         drawContext.fillRect(this.pos.x - offset.x, this.pos.y - offset.y, this.width, this.height);
         drawContext.fillStyle = '#FFFFFF';
         drawContext.fillText(this.name, this.pos.x - offset.x, (this.pos.y - 8) - offset.y);
+        drawContext.stroke();
+        drawContext.closePath();
     }
 }

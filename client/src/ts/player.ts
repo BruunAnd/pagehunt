@@ -3,6 +3,9 @@ import Vector2 from "./vector2";
 import Map from "./map";
 
 export default class Player extends MapEntity {
+    light: number;
+    lightMask: HTMLImageElement;
+
     constructor(id: number, name?: string, pos?: Vector2) {
         if (name) {
             if (pos) {
@@ -15,7 +18,17 @@ export default class Player extends MapEntity {
         else {
             super(id, EntityType.LocalPlayer);
         }
-        
+        this.light = 100;
+
+        let image = new Image();
+        image.addEventListener('load', () => {
+            this.lightMask = image;
+        });
+        image.src = "/client/graphics/light_mask.png";
+
+        if (pos) {
+            this.pos = pos;
+        }
     }
 
     public move(newPos: Vector2, map: Map): Vector2 {
@@ -84,9 +97,19 @@ export default class Player extends MapEntity {
     }
 
     public draw(drawContext: CanvasRenderingContext2D, offset: Vector2): void {
+        drawContext.beginPath();
+        drawContext.arc(this.pos.x - offset.x, this.pos.y - offset.y, this.light, 0, Math.PI * 2, false);
+        drawContext.clip();
+        drawContext.fillStyle = '#FFEEAA';
+        drawContext.fillRect((this.pos.x - offset.x) - 100, (this.pos.y - offset.y) - 100, (this.pos.x - offset.x) + 100, (this.pos.y - offset.y) + 100);
+        drawContext.stroke();
+        drawContext.closePath();
+        drawContext.beginPath();
         drawContext.fillStyle = '#00FF00';
         drawContext.fillRect(this.pos.x - offset.x, this.pos.y - offset.y, this.width, this.height);
         drawContext.fillStyle = '#FFFFFF';
         drawContext.fillText(this.name, this.pos.x - offset.x, (this.pos.y - 8) - offset.y);
+        drawContext.stroke();
+        drawContext.closePath();
     }
 }
