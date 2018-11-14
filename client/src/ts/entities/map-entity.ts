@@ -1,5 +1,5 @@
-import Vector2 from "./vector2";
-import { Game } from "./game";
+import Vector2D from "../vector2d";
+import { Game } from "../game";
 
 export enum EntityType {
     LocalPlayer = "LPlayer",
@@ -19,9 +19,9 @@ export default class MapEntity {
     readonly width: number = 32;
     readonly height: number = 32;
     protected render;
-    public pos: Vector2 = new Vector2(0, 0);
+    public pos: Vector2D = new Vector2D(0, 0);
 
-    constructor(game: Game, id: number, type: EntityType, name?: string, pos?: Vector2) {
+    constructor(game: Game, id: number, type: EntityType, name?: string, pos?: Vector2D) {
         this.game = game;
         this.id = id;
 
@@ -70,7 +70,7 @@ export default class MapEntity {
         this.render();
     }
 
-    public occupiesPosition(position: Vector2): boolean {
+    public occupiesPosition(position: Vector2D): boolean {
         const a = Math.min(this.pos.x + this.width, position.x + this.width) - Math.max(this.pos.x, position.x);
         const b = Math.min(this.pos.y + this.height, position.y + this.height) - Math.max(this.pos.y, position.y);
         return (a >= 0) && (b >= 0);

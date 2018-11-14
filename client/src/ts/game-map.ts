@@ -1,43 +1,38 @@
-import Vector2 from './vector2';
-import MapEntity from './map-entity';
+import Vector2D from './vector2d';
+import MapEntity from './entities/map-entity';
 
 export default class GameMap {
-    mapSize: Vector2;
+    mapSize: Vector2D;
     mapEntities: Map<number, MapEntity>;
 
-    constructor(size: Vector2) {
+    constructor(size: Vector2D) {
         this.mapSize = size;
         this.mapEntities = new Map<number, MapEntity>();
     }
 
-    public addMapEntities(entities: MapEntity[]): void {
+    public addEntity(entities: MapEntity[]): void {
         for (const ent of entities) {
-            this.mapEntities[ent.id] = ent;
+            this.mapEntities.set(ent.id, ent);
         }
-        console.log(this.mapEntities);
     }
 
-    public getMapEntities(): MapEntity[] {
+    public getEntities(): MapEntity[] {
         return Array.from(this.mapEntities.values());
     }
 
-    public getMapEntityByID(id: number): MapEntity {
+    public getEntity(id: number): MapEntity {
         if (!this.mapEntities.has(id)) {
-            console.log(`Unable to find id ${id}`);
             return null;
         }
 
         return this.mapEntities.get(id);
     }
 
-    public removeMapEntityByID(id: number):void {
+    public removeEntity(id: number):void {
         if (!this.mapEntities.has(id)) {
-            console.log(`Unable to find id ${id}`);
             return;
         }
 
-        const ent = this.getMapEntityByID(id);
-        console.log(`Despawned entity '${ent.name}:${ent.id}'`);
         this.mapEntities.delete(id);
     }
 }

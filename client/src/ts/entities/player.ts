@@ -1,10 +1,10 @@
 import MapEntity, { EntityType } from "./map-entity";
-import Vector2 from "./vector2";
-import GameMap from "./game-map";
-import Input from "./input";
-import MovementController from "./movement";
-import { Game } from "./game";
-import { MovementPacket } from "./packets/movement";
+import Vector2D from "../vector2d";
+import GameMap from "../game-map";
+import Input from "../input";
+import MovementController from "../controls/movement";
+import { Game } from "../game";
+import { MovementPacket } from "../packets/movement";
 
 export enum Direction {
     None = 0,
@@ -17,16 +17,14 @@ export enum Direction {
 export default class Player extends MapEntity {
     light: number;
 
-    constructor(game: Game, id: number, name?: string, pos?: Vector2) {
+    constructor(game: Game, id: number, name?: string, pos?: Vector2D) {
         if (name) {
             if (pos) {
                 super(game, id, EntityType.LocalPlayer, name, pos);
-            }
-            else {
+            } else {
                 super(game, id, EntityType.LocalPlayer, name);
             }
-        }
-        else {
+        } else {
             super(game, id, EntityType.LocalPlayer);
         }
         this.light = 100;
@@ -48,19 +46,19 @@ export default class Player extends MapEntity {
         this.checkMovement(dt);
     }
 
-    public move(newPos: Vector2, map: GameMap): Vector2 {
+    public move(newPos: Vector2D, map: GameMap): Vector2D {
         let correctX: number = newPos.x;
         let correctY: number = newPos.y;
         //Check if we are trying to move out of the map
-        if (newPos.x < 0){
+        if (newPos.x < 0) {
             //newPos is to the left of the map boundary
             correctX = 1;
         }
-        if (newPos.y < 0){
+        if (newPos.y < 0) {
             //newPos is above the map boundary
             correctY = 1;
         }
-        if ((newPos.x + this.width) > map.mapSize.x){
+        if ((newPos.x + this.width) > map.mapSize.x) {
             //newPos is to the right of the map boundary
             correctX = map.mapSize.x - (this.width + 1);
         }
@@ -69,22 +67,21 @@ export default class Player extends MapEntity {
             correctY = map.mapSize.y - (this.height + 1);
         }
 
-        let correctPos = new Vector2(correctX, correctY);
+        let correctPos = new Vector2D(correctX, correctY);
         if (!newPos.equals(correctPos)) {
             console.log("Collided with map boundary");
             this.pos = correctPos;
             return correctPos;
         }
 
-
         let canMove: boolean = true;
 
         //Preliminary collision checking
-        for (let ent of map.getMapEntities()) {
+        for (let ent of map.getEntities()) {
             if (ent.occupiesPosition(newPos)) {
                 if (ent.id == this.id)
-                    //Don't check our own collision :D
                     continue;
+
                 //Position is occupied, cannot move!
                 console.log(`${this.name} collided with ${ent.name}`);
                 canMove = this.onCollision(ent);
@@ -100,9 +97,11 @@ export default class Player extends MapEntity {
     }
 
     private onCollision(other: MapEntity): boolean {
+        /* This should NOT be on the client! Only on the server */
         switch (other.type) {
             case EntityType.Page:
                 //Collect and move
+                //
                 return true;
             case EntityType.Slender:
                 //Death
@@ -122,24 +121,21 @@ export default class Player extends MapEntity {
         if (Input.getKey("s")) {
             if (dir == Direction.None) {
                 dir = Direction.Down;
-            }
-            else {
+            } else {
                 dir = dir | Direction.Down;
             }
         }
         if (Input.getKey("a")) {
             if (dir == Direction.None) {
                 dir = Direction.Left;
-            }
-            else {
+            } else {
                 dir = dir | Direction.Left;
             }
         }
         if (Input.getKey("d")) {
             if (dir == Direction.None) {
                 dir = Direction.Right;
-            }
-            else {
+            } else {
                 dir = dir | Direction.Right;
             }
         }

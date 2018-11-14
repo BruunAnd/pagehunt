@@ -1,8 +1,8 @@
 import Packet, {PacketType} from "./packet";
-import Vector2 from "../vector2";
+import Vector2D from "../vector2d";
 
 export class MovementPacket extends Packet {
-    constructor(private newLocation: Vector2) {
+    constructor(private newLocation: Vector2D) {
         super();
     }
 

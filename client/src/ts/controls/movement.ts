@@ -1,8 +1,8 @@
-import { Direction } from "./player";
-import Vector2 from "./vector2";
+import { Direction } from "../entities/player";
+import Vector2D from "../vector2d";
 
 export default class MovementController {
-    public static getNewLocation(currentPos: Vector2, angle: number, distance: number): Vector2 {
+    public static getNewLocation(currentPos: Vector2D, angle: number, distance: number): Vector2D {
         return this.calculateNewPosition(currentPos, angle, distance)
     }
 
@@ -39,7 +39,7 @@ export default class MovementController {
         }
     }
 
-    private static calculateNewPosition(currentPos: Vector2, degrees: number, distance: number): Vector2 {
-        return new Vector2(currentPos.x + distance * Math.cos(degrees * Math.PI / 180), currentPos.y + distance * Math.sin(degrees * Math.PI / 180));
+    private static calculateNewPosition(currentPos: Vector2D, degrees: number, distance: number): Vector2D {
+        return new Vector2D(currentPos.x + distance * Math.cos(degrees * Math.PI / 180), currentPos.y + distance * Math.sin(degrees * Math.PI / 180));
     }
 }

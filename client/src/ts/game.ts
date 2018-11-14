@@ -1,12 +1,12 @@
-import Player from "./player";
+import Player from "./entities/player";
 import Input from "./input";
 import GameMap from "./game-map";
-import Vector2 from "./vector2";
+import Vector2D from "./vector2d";
 import NetworkClient from './network';
 import Packet, {PacketType} from "./packets/packet";
 import { HandshakePacket } from "./packets/handshake";
 import { SpawnEntityPacket } from "./packets/spawn-entity";
-import MapEntity, { EntityType } from "./map-entity";
+import MapEntity, { EntityType } from "./entities/map-entity";
 import { RepositionPacket } from "./packets/reposition";
 import Camera from "./camera";
 import { RemoveEntityPacket } from "./packets/remove-entity";
@@ -28,9 +28,9 @@ export class Game {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
         this.drawContext = this.canvas.getContext('2d');
-        this.camera = new Camera(new Vector2(0, 0), this.canvas);
+        this.camera = new Camera(new Vector2D(0, 0), this.canvas);
         this.initNetworkClient();
-        this.map = this.buildMap();//TODO: Get map from server
+        this.map = this.buildMap(); // TODO: Get map from server
 
         document.addEventListener('keydown', (event) => {
             Input.addKey(event.key);
@@ -67,14 +67,13 @@ export class Game {
 
     private buildMap(): GameMap {
         //Receive map from server
-        return new GameMap(new Vector2(2000, 2000));
+        return new GameMap(new Vector2D(2000, 2000));
     }
 
-    private buildPlayer(id: number, name: string, pos?: Vector2): Player {
+    private buildPlayer(id: number, name: string, pos?: Vector2D): Player {
         if (pos) {
             return new Player(this, id, name, pos);
-        }
-        else {
+        } else {
             return new Player(this, id, name);
         }
     }
@@ -91,28 +90,28 @@ export class Game {
     }
 
     private handleSpawnEntity(packet: SpawnEntityPacket): void {
-        const position = new Vector2(packet.x, packet.y);
+        const position = new Vector2D(packet.x, packet.y);
 
         if (packet.isSelf) {
             this.player = this.buildPlayer(packet.id, packet.name, position);
-            this.map.addMapEntities([this.player]);
+            this.map.addEntity([this.player]);
             this.camera.setPosition(this.player.pos);
         } else {
             const entity = new MapEntity(this, packet.id, EntityType.NetworkPlayer, packet.name, position);
-            this.map.addMapEntities([entity]);
+            this.map.addEntity([entity]);
         }
     }
 
     private handleReposition(packet: RepositionPacket): void {
-        this.map.getMapEntities().forEach(function (ent: MapEntity) {
+        this.map.getEntities().forEach(function (ent: MapEntity) {
             if (ent.id === packet.id) {
-                ent.pos = new Vector2(packet.x, packet.y);
+                ent.pos = new Vector2D(packet.x, packet.y);
             }
         });
     }
 
     private handleRemoveEntity(packet: RemoveEntityPacket) {
-        this.map.removeMapEntityByID(packet.id);
+        this.map.removeEntity(packet.id);
     }
 
     public packetReceived(packet: Packet): void {
