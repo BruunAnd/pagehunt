@@ -20,6 +20,7 @@ export default class MapEntity {
     readonly height: number = 32;
     protected render;
     public pos: Vector2D = new Vector2D(0, 0);
+    public renderID: number;
 
     constructor(game: Game, id: number, type: EntityType, name?: string, pos?: Vector2D) {
         this.game = game;
@@ -55,7 +56,6 @@ export default class MapEntity {
             this.pos = pos;
         }
 
-        console.log(`Spawned entity '${name}:${this.id}' at position 'x:${this.pos.x}, y:${this.pos.y}'`);
         this.render = () => {
             this.game.drawContext.beginPath();
             this.game.drawContext.fillStyle = '#FF0000';
@@ -65,9 +65,11 @@ export default class MapEntity {
             this.game.drawContext.stroke();
             this.game.drawContext.closePath();
 
-            requestAnimationFrame(this.render);
+            this.renderID = requestAnimationFrame(this.render);
         };
-        this.render();
+        requestAnimationFrame(this.render);
+
+        console.log(`Spawned entity '${name}:${this.id}' at position 'x:${this.pos.x}, y:${this.pos.y}'`);
     }
 
     public occupiesPosition(position: Vector2D): boolean {

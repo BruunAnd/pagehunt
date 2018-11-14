@@ -38,8 +38,8 @@ export default class Player extends MapEntity {
             this.game.drawContext.stroke();
             this.game.drawContext.closePath();
 
-            requestAnimationFrame(this.render);
-        }
+            this.renderID = requestAnimationFrame(this.render);
+        };
     }
 
     public tick(dt: number): void {

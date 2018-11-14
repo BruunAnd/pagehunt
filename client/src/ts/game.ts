@@ -57,7 +57,7 @@ export class Game {
             requestAnimationFrame(this.render);
         };
 
-        this.render();
+        requestAnimationFrame(this.render);
     }
 
     private initNetworkClient(): void {
