@@ -12,6 +12,7 @@ import Camera from "./camera";
 import { RemoveEntityPacket } from "./packets/remove-entity";
 
 export class Game {
+    tickrate: number = 40;
     canvas: HTMLCanvasElement;
     player: Player;
     map: GameMap;
@@ -46,17 +47,35 @@ export class Game {
         });
 
         //Start the game loop
-        this.tickInterval = setInterval(() => this.tick(), 16);
+        this.tickInterval = setInterval(() => this.tick(), 1000/this.tickrate);
         this.enableInput = true;
         this.render = () => {
             this.drawContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
+            this.map.getEntities().forEach((ent: MapEntity) => {
+                // Don't draw the player, yet
+                if (ent == this.player) {
+                    return;
+                }
+
+                // Don't draw stuff that is not near us
+                if (ent.pos.distance(this.player.pos) > this.player.light + 100) {
+                    return;
+                }
+
+                ent.render();
+            });
+
+            // Fog of war
             this.drawContext.fillStyle = '#000000';
             this.drawContext.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
+            // Draw the player
+            if (this.player)
+                this.player.render();
+
             requestAnimationFrame(this.render);
         };
-
         requestAnimationFrame(this.render);
     }
 
@@ -111,6 +130,7 @@ export class Game {
     }
 
     private handleRemoveEntity(packet: RemoveEntityPacket) {
+        console.log(`Player ${packet.id} disconnected!`);
         this.map.removeEntity(packet.id);
     }
 

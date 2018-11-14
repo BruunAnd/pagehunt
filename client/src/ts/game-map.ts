@@ -33,7 +33,7 @@ export default class GameMap {
             return;
         }
 
-        cancelAnimationFrame(this.mapEntities.get(id).renderID);
         this.mapEntities.delete(id);
+        console.log(`Despawned entity with ID '${id}'.`);
     }
 }

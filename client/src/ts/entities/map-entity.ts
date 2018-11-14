@@ -18,7 +18,6 @@ export default class MapEntity {
     readonly type: EntityType;
     readonly width: number = 32;
     readonly height: number = 32;
-    protected render;
     public pos: Vector2D = new Vector2D(0, 0);
     public renderID: number;
 
@@ -56,21 +55,17 @@ export default class MapEntity {
             this.pos = pos;
         }
 
-        this.render = () => {
-            this.game.drawContext.beginPath();
-            this.game.drawContext.fillStyle = '#FF0000';
-            this.game.drawContext.fillRect(this.pos.x - this.game.camera.getPosition().x, this.pos.y - this.game.camera.getPosition().y, this.width, this.height);
-            this.game.drawContext.fillStyle = '#FFFFFF';
-            this.game.drawContext.fillText(this.name, this.pos.x - this.game.camera.getPosition().x, (this.pos.y - 8) - this.game.camera.getPosition().y);
-            this.game.drawContext.stroke();
-            this.game.drawContext.closePath();
-
-            this.renderID = requestAnimationFrame(this.render);
-        };
-        requestAnimationFrame(this.render);
-
         console.log(`Spawned entity '${name}:${this.id}' at position 'x:${this.pos.x}, y:${this.pos.y}'`);
     }
+
+    public render() {
+        this.game.drawContext.beginPath();
+        this.game.drawContext.fillStyle = '#FF0000';
+        this.game.drawContext.fillRect(this.pos.x - this.game.camera.getPosition().x, this.pos.y - this.game.camera.getPosition().y, this.width, this.height);
+        this.game.drawContext.fillStyle = '#FFFFFF';
+        this.game.drawContext.fillText(this.name, this.pos.x - this.game.camera.getPosition().x, (this.pos.y - 8) - this.game.camera.getPosition().y);
+        this.game.drawContext.closePath();
+    };
 
     public occupiesPosition(position: Vector2D): boolean {
         const a = Math.min(this.pos.x + this.width, position.x + this.width) - Math.max(this.pos.x, position.x);

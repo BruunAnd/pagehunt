@@ -28,22 +28,29 @@ export default class Player extends MapEntity {
             super(game, id, EntityType.LocalPlayer);
         }
         this.light = 100;
-
-        this.render = () => {
-            this.game.drawContext.beginPath();
-            this.game.drawContext.fillStyle = '#00FF00';
-            this.game.drawContext.fillRect(this.pos.x - this.game.camera.getPosition().x, this.pos.y - this.game.camera.getPosition().y, this.width, this.height);
-            this.game.drawContext.fillStyle = '#FFFFFF';
-            this.game.drawContext.fillText(this.name, this.pos.x - this.game.camera.getPosition().x, (this.pos.y - 8) - this.game.camera.getPosition().y);
-            this.game.drawContext.stroke();
-            this.game.drawContext.closePath();
-
-            this.renderID = requestAnimationFrame(this.render);
-        };
     }
 
     public tick(dt: number): void {
         this.checkMovement(dt);
+    }
+
+    public render() {
+        // Remove the fog of war in circle based on the light value
+        this.game.drawContext.beginPath();
+            const test = this.game.drawContext.globalCompositeOperation;
+            this.game.drawContext.globalCompositeOperation = 'destination-out';
+            this.game.drawContext.fillStyle = '#fff293';
+            this.game.drawContext.arc(this.pos.x - this.game.camera.getPosition().x, this.pos.y - this.game.camera.getPosition().y, this.light,0,Math.PI*2,true);
+            this.game.drawContext.fill();
+            this.game.drawContext.globalCompositeOperation = test;
+        this.game.drawContext.closePath();
+        // Draw the player
+        this.game.drawContext.beginPath();
+            this.game.drawContext.fillStyle = '#00FF00';
+            this.game.drawContext.fillRect(this.pos.x - this.game.camera.getPosition().x, this.pos.y - this.game.camera.getPosition().y, this.width, this.height);
+            this.game.drawContext.fillStyle = '#FFFFFF';
+            this.game.drawContext.fillText(this.name, this.pos.x - this.game.camera.getPosition().x, (this.pos.y - 8) - this.game.camera.getPosition().y);
+        this.game.drawContext.closePath();
     }
 
     public move(newPos: Vector2D, map: GameMap): Vector2D {
