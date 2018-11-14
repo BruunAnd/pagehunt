@@ -66,10 +66,6 @@ export class Game {
                 ent.render();
             });
 
-            // Fog of war
-            this.drawContext.fillStyle = '#000000';
-            this.drawContext.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
             // Draw the player
             if (this.player)
                 this.player.render();

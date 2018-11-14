@@ -16,6 +16,8 @@ export enum Direction {
 
 export default class Player extends MapEntity {
     light: number;
+    lightMask: HTMLCanvasElement;
+    lightDrawContext: CanvasRenderingContext2D;
 
     constructor(game: Game, id: number, name?: string, pos?: Vector2D) {
         if (name) {
@@ -27,7 +29,12 @@ export default class Player extends MapEntity {
         } else {
             super(game, id, EntityType.LocalPlayer);
         }
-        this.light = 100;
+        this.light = 300;
+        this.lightMask = document.createElement('canvas');
+        this.lightMask.width = game.canvas.width;
+        this.lightMask.height = game.canvas.height;
+        this.lightDrawContext = this.lightMask.getContext('2d');
+
     }
 
     public tick(dt: number): void {
@@ -35,15 +42,18 @@ export default class Player extends MapEntity {
     }
 
     public render() {
+        // (Re)draw fog of war
+        this.lightDrawContext.fillStyle = '#000000';
+        this.lightDrawContext.fillRect(0, 0, this.lightMask.width, this.lightMask.height);
         // Remove the fog of war in circle based on the light value
-        this.game.drawContext.beginPath();
-            const test = this.game.drawContext.globalCompositeOperation;
-            this.game.drawContext.globalCompositeOperation = 'destination-out';
-            this.game.drawContext.fillStyle = '#fff293';
-            this.game.drawContext.arc(this.pos.x - this.game.camera.getPosition().x, this.pos.y - this.game.camera.getPosition().y, this.light,0,Math.PI*2,true);
-            this.game.drawContext.fill();
-            this.game.drawContext.globalCompositeOperation = test;
-        this.game.drawContext.closePath();
+        this.lightDrawContext.beginPath();
+            this.lightDrawContext.globalCompositeOperation = 'xor';
+            this.lightDrawContext.fillStyle = '#fff293';
+            this.lightDrawContext.arc((this.pos.x + this.width / 2) - this.game.camera.getPosition().x, (this.pos.y + this.height / 2) - this.game.camera.getPosition().y, this.light,0,Math.PI*2,true);
+            this.lightDrawContext.fill();
+            this.lightDrawContext.globalCompositeOperation = 'source-over';
+        this.lightDrawContext.closePath();
+        this.game.drawContext.drawImage(this.lightMask, 0, 0);
         // Draw the player
         this.game.drawContext.beginPath();
             this.game.drawContext.fillStyle = '#00FF00';
