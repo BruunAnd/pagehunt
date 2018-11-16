@@ -17,7 +17,7 @@ export enum Direction {
 export default class Player extends MapEntity {
     light: number;
     lightMask: HTMLCanvasElement;
-    lightDrawContext: CanvasRenderingContext2D;
+    lightctx: CanvasRenderingContext2D;
 
     constructor(game: Game, id: number, name?: string, pos?: Vector2D) {
         if (name) {
@@ -31,9 +31,9 @@ export default class Player extends MapEntity {
         }
         this.light = 300;
         this.lightMask = document.createElement('canvas');
-        this.lightMask.width = game.canvas.width;
-        this.lightMask.height = game.canvas.height;
-        this.lightDrawContext = this.lightMask.getContext('2d');
+        this.lightMask.width = game.canvas.get('world').width;
+        this.lightMask.height = game.canvas.get('world').height;
+        this.lightctx = this.lightMask.getContext('2d');
 
     }
 
@@ -43,24 +43,24 @@ export default class Player extends MapEntity {
 
     public render() {
         // (Re)draw fog of war
-        this.lightDrawContext.fillStyle = '#000000';
-        this.lightDrawContext.fillRect(0, 0, this.lightMask.width, this.lightMask.height);
+        this.lightctx.fillStyle = '#000000';
+        this.lightctx.fillRect(0, 0, this.lightMask.width, this.lightMask.height);
         // Remove the fog of war in circle based on the light value
-        this.lightDrawContext.beginPath();
-            this.lightDrawContext.globalCompositeOperation = 'xor';
-            this.lightDrawContext.fillStyle = '#fff293';
-            this.lightDrawContext.arc((this.pos.x + this.width / 2) - this.game.camera.getPosition().x, (this.pos.y + this.height / 2) - this.game.camera.getPosition().y, this.light,0,Math.PI*2,true);
-            this.lightDrawContext.fill();
-            this.lightDrawContext.globalCompositeOperation = 'source-over';
-        this.lightDrawContext.closePath();
-        this.game.drawContext.drawImage(this.lightMask, 0, 0);
+        this.lightctx.beginPath();
+            this.lightctx.globalCompositeOperation = 'xor';
+            this.lightctx.fillStyle = '#fff293';
+            this.lightctx.arc((this.pos.x + this.width / 2) - this.game.camera.getPosition().x, (this.pos.y + this.height / 2) - this.game.camera.getPosition().y, this.light,0,Math.PI*2,true);
+            this.lightctx.fill();
+            this.lightctx.globalCompositeOperation = 'source-over';
+        this.lightctx.closePath();
+        this.game.ctx.get('world').drawImage(this.lightMask, 0, 0);
         // Draw the player
-        this.game.drawContext.beginPath();
-            this.game.drawContext.fillStyle = '#00FF00';
-            this.game.drawContext.fillRect(this.pos.x - this.game.camera.getPosition().x, this.pos.y - this.game.camera.getPosition().y, this.width, this.height);
-            this.game.drawContext.fillStyle = '#FFFFFF';
-            this.game.drawContext.fillText(this.name, this.pos.x - this.game.camera.getPosition().x, (this.pos.y - 8) - this.game.camera.getPosition().y);
-        this.game.drawContext.closePath();
+        this.game.ctx.get('world').beginPath();
+            this.game.ctx.get('world').fillStyle = '#00FF00';
+            this.game.ctx.get('world').fillRect(this.pos.x - this.game.camera.getPosition().x, this.pos.y - this.game.camera.getPosition().y, this.width, this.height);
+            this.game.ctx.get('world').fillStyle = '#FFFFFF';
+            this.game.ctx.get('world').fillText(this.name, this.pos.x - this.game.camera.getPosition().x, (this.pos.y - 8) - this.game.camera.getPosition().y);
+        this.game.ctx.get('world').closePath();
     }
 
     public move(newPos: Vector2D, map: GameMap): Vector2D {

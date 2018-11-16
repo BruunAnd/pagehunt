@@ -13,10 +13,10 @@ import { RemoveEntityPacket } from "./packets/remove-entity";
 
 export class Game {
     tickrate: number = 40;
-    canvas: HTMLCanvasElement;
+    canvas: Map<string, HTMLCanvasElement> = new Map<string, HTMLCanvasElement>();
+    ctx: Map<String, CanvasRenderingContext2D> = new Map<String, CanvasRenderingContext2D>();
     player: Player;
     map: GameMap;
-    drawContext: CanvasRenderingContext2D;
     lastTickTime: number = Date.now();
     tickInterval: number;
     enableInput: boolean = false;
@@ -25,11 +25,22 @@ export class Game {
     render;
     
     constructor(canvasId: string) {
-        this.canvas = <HTMLCanvasElement>document.getElementById(canvasId);
-        this.canvas.width = window.innerWidth;
-        this.canvas.height = window.innerHeight;
-        this.drawContext = this.canvas.getContext('2d');
-        this.camera = new Camera(new Vector2D(0, 0), this.canvas);
+        const worldCanvas = <HTMLCanvasElement>document.getElementById(canvasId);
+        worldCanvas.width = window.innerWidth;
+        worldCanvas.height = window.innerHeight;
+        this.canvas.set('world', worldCanvas);
+        this.ctx.set('world', worldCanvas.getContext('2d'));
+        const fogCanvas = document.createElement('canvas');
+        fogCanvas.width = worldCanvas.width;
+        fogCanvas.height = worldCanvas.height;
+        this.canvas.set('fog', fogCanvas);
+        this.ctx.set('fog', fogCanvas.getContext('2d'));
+        const entityCanvas = document.createElement('canvas');
+        entityCanvas.width = worldCanvas.width;
+        entityCanvas.height = worldCanvas.height;
+        this.canvas.set('entity', entityCanvas);
+        this.ctx.set('entity', entityCanvas.getContext('2d'));
+        this.camera = new Camera(new Vector2D(0, 0), worldCanvas);
         this.initNetworkClient();
         this.map = this.buildMap(); // TODO: Get map from server
 
@@ -40,9 +51,12 @@ export class Game {
             Input.removeKey(event.key);
         });
         window.addEventListener('resize', () => {
-            this.canvas.width = window.innerWidth;
-            this.canvas.height = window.innerHeight;
-            this.camera.onResize(this.canvas);
+            this.canvas.forEach((value: HTMLCanvasElement) => {
+                value.width = window.innerWidth;
+                value.height = window.innerHeight;
+            });
+
+            this.camera.onResize(this.canvas.get('world'));
             this.camera.setPosition(this.player.pos);
         });
 
@@ -50,7 +64,7 @@ export class Game {
         this.tickInterval = setInterval(() => this.tick(), 1000/this.tickrate);
         this.enableInput = true;
         this.render = () => {
-            this.drawContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.get('world').clearRect(0, 0, this.canvas.get('world').width, this.canvas.get('world').height);
 
             this.map.getEntities().forEach((ent: MapEntity) => {
                 // Don't draw the player, yet

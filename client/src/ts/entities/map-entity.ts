@@ -19,7 +19,6 @@ export default class MapEntity {
     readonly width: number = 32;
     readonly height: number = 32;
     public pos: Vector2D = new Vector2D(0, 0);
-    public renderID: number;
 
     constructor(game: Game, id: number, type: EntityType, name?: string, pos?: Vector2D) {
         this.game = game;
@@ -59,12 +58,12 @@ export default class MapEntity {
     }
 
     public render() {
-        this.game.drawContext.beginPath();
-        this.game.drawContext.fillStyle = '#FF0000';
-        this.game.drawContext.fillRect(this.pos.x - this.game.camera.getPosition().x, this.pos.y - this.game.camera.getPosition().y, this.width, this.height);
-        this.game.drawContext.fillStyle = '#FFFFFF';
-        this.game.drawContext.fillText(this.name, this.pos.x - this.game.camera.getPosition().x, (this.pos.y - 8) - this.game.camera.getPosition().y);
-        this.game.drawContext.closePath();
+        this.game.ctx.get('world').beginPath();
+        this.game.ctx.get('world').fillStyle = '#FF0000';
+        this.game.ctx.get('world').fillRect(this.pos.x - this.game.camera.getPosition().x, this.pos.y - this.game.camera.getPosition().y, this.width, this.height);
+        this.game.ctx.get('world').fillStyle = '#FFFFFF';
+        this.game.ctx.get('world').fillText(this.name, this.pos.x - this.game.camera.getPosition().x, (this.pos.y - 8) - this.game.camera.getPosition().y);
+        this.game.ctx.get('world').closePath();
     };
 
     public occupiesPosition(position: Vector2D): boolean {
