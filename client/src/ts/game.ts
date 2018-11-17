@@ -10,6 +10,7 @@ import MapEntity, { EntityType } from "./entities/map-entity";
 import { RepositionPacket } from "./packets/reposition";
 import Camera from "./camera";
 import { RemoveEntityPacket } from "./packets/remove-entity";
+import Util from "./util";
 
 export class Game {
     tickrate: number = 40;
@@ -64,14 +65,47 @@ export class Game {
         this.tickInterval = setInterval(() => this.tick(), 1000/this.tickrate);
         this.enableInput = true;
         this.render = () => {
+            if (!this.player) {
+                requestAnimationFrame(this.render);
+                return;
+            }
             this.ctx.get('world').clearRect(0, 0, this.canvas.get('world').width, this.canvas.get('world').height);
 
-            this.map.getEntities().forEach((ent: MapEntity) => {
-                // Don't draw the player, yet
-                if (ent == this.player) {
-                    return;
+            // (Re)draw fog of war
+            this.ctx.get('fog').fillStyle = '#000000';
+            this.ctx.get('fog').fillRect(0, 0, this.canvas.get('fog').width, this.canvas.get('fog').height);
+
+            const x = (this.player.pos.x + this.player.width / 2) - this.camera.getPosition().x;
+            const y = (this.player.pos.y + this.player.height / 2) - this.camera.getPosition().y;
+            const lightMin = this.player.light - 10;
+            const lightMax = this.player.light + 10;
+
+            // Remove the fog of war in circle based on the light value
+            this.ctx.get('fog').beginPath();
+            let radGrd: CanvasGradient;
+                if (this.player.hasLigth) {
+                    radGrd = this.ctx.get('world').createRadialGradient( x, y, 20, x, y, Util.getRandomRange(lightMin, lightMax));
+                    radGrd.addColorStop( 0, 'rgba( 0, 0, 0,  1 )' );
+                    radGrd.addColorStop( this.player.lightDensity, 'rgba( 0, 0, 0, .6 )' );
+                    radGrd.addColorStop( 1, 'rgba( 0, 0, 0,  0 )' );
+                    document.body.style.background = '#6a6a05';
+                } else {
+                    radGrd = this.ctx.get('world').createRadialGradient( x, y, 20, x, y, this.player.light);
+                    radGrd.addColorStop( 0, 'rgba( 0, 0, 0, .4 )' );
+                    radGrd.addColorStop( .7, 'rgba( 0, 0, 0, .1 )' );
+                    radGrd.addColorStop( 1, 'rgba( 0, 0, 0, 0 )' );
+                    document.body.style.background = '#554444';
                 }
 
+                this.ctx.get('fog').globalCompositeOperation = 'xor';
+                this.ctx.get('fog').fillStyle = radGrd;
+                this.ctx.get('fog').arc(x, y, lightMax,0,Math.PI*2,true);
+                this.ctx.get('fog').fill();
+
+                this.ctx.get('fog').globalCompositeOperation = 'source-over';
+            this.ctx.get('fog').closePath();
+
+            this.map.getEntities().forEach((ent: MapEntity) => {
                 // Don't draw stuff that is not near us
                 if (ent.pos.distance(this.player.pos) > this.player.light + 100) {
                     return;
@@ -80,10 +114,7 @@ export class Game {
                 ent.render();
             });
 
-            // Draw the player
-            if (this.player)
-                this.player.render();
-
+            this.ctx.get('world').drawImage(this.canvas.get('fog'), 0, 0);
             requestAnimationFrame(this.render);
         };
         requestAnimationFrame(this.render);

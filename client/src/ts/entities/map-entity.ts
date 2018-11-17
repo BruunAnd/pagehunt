@@ -58,11 +58,14 @@ export default class MapEntity {
     }
 
     public render() {
+        const x = this.pos.x - this.game.camera.getPosition().x;
+        const y = this.pos.y - this.game.camera.getPosition().y;
+
         this.game.ctx.get('world').beginPath();
-        this.game.ctx.get('world').fillStyle = '#FF0000';
-        this.game.ctx.get('world').fillRect(this.pos.x - this.game.camera.getPosition().x, this.pos.y - this.game.camera.getPosition().y, this.width, this.height);
-        this.game.ctx.get('world').fillStyle = '#FFFFFF';
-        this.game.ctx.get('world').fillText(this.name, this.pos.x - this.game.camera.getPosition().x, (this.pos.y - 8) - this.game.camera.getPosition().y);
+            this.game.ctx.get('world').fillStyle = '#AA0000';
+            this.game.ctx.get('world').fillRect(x, y, this.width, this.height);
+            this.game.ctx.get('world').fillStyle = '#FFFFFF';
+            this.game.ctx.get('world').fillText(this.name, x, y - 5);
         this.game.ctx.get('world').closePath();
     };
 
