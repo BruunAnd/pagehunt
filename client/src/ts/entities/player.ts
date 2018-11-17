@@ -5,6 +5,7 @@ import Input from "../input";
 import MovementController from "../controls/movement";
 import { Game } from "../game";
 import { MovementPacket } from "../packets/movement";
+import Util from "../util";
 
 export enum Direction {
     None = 0,
@@ -16,8 +17,8 @@ export enum Direction {
 
 export default class Player extends MapEntity {
     light: number;
-    lightMask: HTMLCanvasElement;
-    lightctx: CanvasRenderingContext2D;
+    lightDensity: number;
+    minLightLevel: number;
 
     constructor(game: Game, id: number, name?: string, pos?: Vector2D) {
         if (name) {
@@ -30,11 +31,8 @@ export default class Player extends MapEntity {
             super(game, id, EntityType.LocalPlayer);
         }
         this.light = 300;
-        this.lightMask = document.createElement('canvas');
-        this.lightMask.width = game.canvas.get('world').width;
-        this.lightMask.height = game.canvas.get('world').height;
-        this.lightctx = this.lightMask.getContext('2d');
-
+        this.lightDensity = .4;
+        this.minLightLevel = 20;
     }
 
     public tick(dt: number): void {
@@ -43,23 +41,35 @@ export default class Player extends MapEntity {
 
     public render() {
         // (Re)draw fog of war
-        this.lightctx.fillStyle = '#000000';
-        this.lightctx.fillRect(0, 0, this.lightMask.width, this.lightMask.height);
+        this.game.ctx.get('fog').fillStyle = '#000000';
+        this.game.ctx.get('fog').fillRect(0, 0, this.game.canvas.get('fog').width, this.game.canvas.get('fog').height);
+
+        const x = (this.pos.x + this.width / 2) - this.game.camera.getPosition().x;
+        const y = (this.pos.y + this.height / 2) - this.game.camera.getPosition().y;
+        const lightMin = this.light - 10;
+        const lightMax = this.light + 10;
+
         // Remove the fog of war in circle based on the light value
-        this.lightctx.beginPath();
-            this.lightctx.globalCompositeOperation = 'xor';
-            this.lightctx.fillStyle = '#fff293';
-            this.lightctx.arc((this.pos.x + this.width / 2) - this.game.camera.getPosition().x, (this.pos.y + this.height / 2) - this.game.camera.getPosition().y, this.light,0,Math.PI*2,true);
-            this.lightctx.fill();
-            this.lightctx.globalCompositeOperation = 'source-over';
-        this.lightctx.closePath();
-        this.game.ctx.get('world').drawImage(this.lightMask, 0, 0);
+        this.game.ctx.get('fog').beginPath();
+            const radGrd = this.game.ctx.get('world').createRadialGradient( x, y, this.minLightLevel, x, y, Util.getRandomRange(lightMin, lightMax));
+            radGrd.addColorStop( 0, 'rgba( 0, 0, 0,  1 )' );
+            radGrd.addColorStop( this.lightDensity, 'rgba( 0, 0, 0, .6 )' );
+            radGrd.addColorStop( 1, 'rgba( 0, 0, 0,  0 )' );
+
+            this.game.ctx.get('fog').globalCompositeOperation = 'xor';
+            this.game.ctx.get('fog').fillStyle = radGrd;
+            this.game.ctx.get('fog').arc(x, y, lightMax,0,Math.PI*2,true);
+            this.game.ctx.get('fog').fill();
+
+            this.game.ctx.get('fog').globalCompositeOperation = 'source-over';
+        this.game.ctx.get('fog').closePath();
+        this.game.ctx.get('world').drawImage(this.game.canvas.get('fog'), 0, 0);
         // Draw the player
         this.game.ctx.get('world').beginPath();
             this.game.ctx.get('world').fillStyle = '#00FF00';
-            this.game.ctx.get('world').fillRect(this.pos.x - this.game.camera.getPosition().x, this.pos.y - this.game.camera.getPosition().y, this.width, this.height);
+            this.game.ctx.get('world').fillRect(x, y, this.width, this.height);
             this.game.ctx.get('world').fillStyle = '#FFFFFF';
-            this.game.ctx.get('world').fillText(this.name, this.pos.x - this.game.camera.getPosition().x, (this.pos.y - 8) - this.game.camera.getPosition().y);
+            this.game.ctx.get('world').fillText(this.name, x, y - 8);
         this.game.ctx.get('world').closePath();
     }
 
