@@ -5,6 +5,7 @@ import Input from "../input";
 import MovementController from "../controls/movement";
 import { Game } from "../game";
 import { MovementPacket } from "../packets/movement";
+import Renderer from "../renderer";
 
 export enum Direction {
     None = 0,
@@ -46,16 +47,16 @@ export default class Player extends MapEntity {
         }
     }
 
-    public render() {
+    public render(renderer: Renderer) {
         const x = this.pos.x - this.game.camera.getPosition().x;
         const y = this.pos.y - this.game.camera.getPosition().y;
 
-        this.game.ctx.get('world').beginPath();
-            this.game.ctx.get('world').fillStyle = '#00AA00';
-            this.game.ctx.get('world').fillRect(x, y, this.width, this.height);
-            this.game.ctx.get('world').fillStyle = '#FFFFFF';
-            this.game.ctx.get('world').fillText(this.name, x, y - 5);
-        this.game.ctx.get('world').closePath();
+        renderer.ctx.get('world').beginPath();
+            renderer.ctx.get('world').fillStyle = '#00AA00';
+            renderer.ctx.get('world').fillRect(x, y, this.width, this.height);
+            renderer.ctx.get('world').fillStyle = '#FFFFFF';
+            renderer.ctx.get('world').fillText(this.name, x, y - 5);
+        renderer.ctx.get('world').closePath();
     }
 
     public move(newPos: Vector2D, map: GameMap): Vector2D {
