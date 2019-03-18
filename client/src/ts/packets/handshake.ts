@@ -1,6 +1,6 @@
 import Packet, {PacketType} from './packet';
 
-export class HandshakePacket extends Packet {
+export default class HandshakePacket extends Packet {
     constructor(private name: string) {
         super();
     }

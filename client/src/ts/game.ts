@@ -2,14 +2,12 @@ import Player from "./entities/player";
 import Input from "./input";
 import GameMap from "./game-map";
 import Vector2D from "./vector2d";
-import NetworkClient from './network';
-import Packet, {PacketType} from "./packets/packet";
-import { HandshakePacket } from "./packets/handshake";
-import { SpawnEntityPacket } from "./packets/spawn-entity";
 import MapEntity, { EntityType } from "./entities/map-entity";
-import { RepositionPacket } from "./packets/reposition";
+import NetworkClient from './network';
+import SpawnEntityPacket from "./packets/spawn-entity";
+import RepositionPacket from "./packets/reposition";
+import RemoveEntityPacket from "./packets/remove-entity";
 import Camera from "./camera";
-import { RemoveEntityPacket } from "./packets/remove-entity";
 import Renderer from "./renderer";
 
 export class Game {
@@ -24,7 +22,7 @@ export class Game {
     renderer: Renderer;
     
     constructor(canvasId: string) {
-        this.initNetworkClient();
+        this.networkClient = new NetworkClient(this, 'localhost:4000');
         this.renderer = new Renderer(this, canvasId);
         this.map = this.buildMap(); // TODO: Get map from server
         this.camera = new Camera(new Vector2D(0, 0), this.renderer.canvas.get('world'));
@@ -48,11 +46,6 @@ export class Game {
         //Start the game loop
         this.tickInterval = setInterval(() => this.tick(), 1000/this.tickrate);
         this.enableInput = true;
-    }
-
-    private initNetworkClient(): void {
-        this.networkClient = new NetworkClient('localhost:4000',
-            (packet: Packet) => this.packetReceived(packet), () => this.onConnected());
     }
 
     private buildMap(): GameMap {
@@ -79,7 +72,7 @@ export class Game {
             this.camera.tick(dt);
     }
 
-    private handleSpawnEntity(packet: SpawnEntityPacket): void {
+    public handleSpawnEntity(packet: SpawnEntityPacket): void {
         const position = new Vector2D(packet.x, packet.y);
 
         if (packet.isSelf) {
@@ -92,7 +85,7 @@ export class Game {
         }
     }
 
-    private handleReposition(packet: RepositionPacket): void {
+    public handleReposition(packet: RepositionPacket): void {
         this.map.getEntities().forEach(function (ent: MapEntity) {
             if (ent.id === packet.id) {
                 ent.pos = new Vector2D(packet.x, packet.y);
@@ -100,21 +93,9 @@ export class Game {
         });
     }
 
-    private handleRemoveEntity(packet: RemoveEntityPacket) {
+    public handleRemoveEntity(packet: RemoveEntityPacket) {
         console.log(`Player ${packet.id} disconnected!`);
         this.map.removeEntity(packet.id);
-    }
-
-    public packetReceived(packet: Packet): void {
-        switch (packet.getType()) {
-            case PacketType.SpawnEntity: return this.handleSpawnEntity(<SpawnEntityPacket> packet);
-            case PacketType.Reposition: return this.handleReposition(<RepositionPacket> packet);
-            case PacketType.RemoveEntity: return this.handleRemoveEntity(<RemoveEntityPacket> packet);
-        }
-    }
-
-    public onConnected(): void {
-        this.networkClient.sendPacket(new HandshakePacket('Anders'));
     }
 }
 

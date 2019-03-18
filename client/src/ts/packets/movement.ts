@@ -1,7 +1,7 @@
 import Packet, {PacketType} from "./packet";
 import Vector2D from "../vector2d";
 
-export class MovementPacket extends Packet {
+export default class MovementPacket extends Packet {
     constructor(private newLocation: Vector2D) {
         super();
     }

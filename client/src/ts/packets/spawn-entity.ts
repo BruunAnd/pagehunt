@@ -1,6 +1,6 @@
 import Packet, {PacketType} from './packet';
 
-export class SpawnEntityPacket extends Packet {
+export default class SpawnEntityPacket extends Packet {
     public x: number;
     public y: number;
     public id: number;

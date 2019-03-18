@@ -4,7 +4,6 @@ import GameMap from "../game-map";
 import Input from "../input";
 import MovementController from "../controls/movement";
 import { Game } from "../game";
-import { MovementPacket } from "../packets/movement";
 import Renderer from "../renderer";
 
 export enum Direction {
@@ -160,7 +159,7 @@ export default class Player extends MapEntity {
             if (angle != -1) {
                 const newLocation = MovementController.getNewLocation(this.pos, angle, moveSpeed * dt);
                 const actualNewLocation = this.game.player.move(newLocation, this.game.map);
-                this.game.networkClient.sendPacket(new MovementPacket(actualNewLocation));
+                this.game.networkClient.sendPlayerMovement(actualNewLocation);
                 this.game.camera.setPosition(this.game.player.pos);
             }
         }
