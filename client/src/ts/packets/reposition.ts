@@ -1,6 +1,6 @@
 import Packet, {PacketType} from "./packet";
 
-export class RepositionPacket extends Packet {
+export default class RepositionPacket extends Packet {
     public x: number;
     public y: number;
     public id: number;

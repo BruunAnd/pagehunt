@@ -1,6 +1,6 @@
 import Packet, {PacketType} from './packet';
 
-export class EntityMovedPacket extends Packet {
+export default class EntityMovedPacket extends Packet {
     public x: number;
     public y: number;
 

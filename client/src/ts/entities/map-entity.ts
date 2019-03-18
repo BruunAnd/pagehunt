@@ -1,25 +1,29 @@
-import Vector2 from "./vector2";
+import Vector2D from "../vector2d";
+import {Game} from "../game";
 
 export enum EntityType {
     LocalPlayer = "LPlayer",
     NetworkPlayer = "NPlayer",
     Slender = "Slender",
     Page = "Page",
+    Light = "Light",
     Tree = "Tree"
 }
 
 export default class MapEntity {
     private picture: HTMLImageElement = null;
+    readonly game;
     readonly id: number;
     readonly name: string;
     readonly type: EntityType;
     readonly width: number = 32;
     readonly height: number = 32;
-    public pos: Vector2 = new Vector2(0, 0);
+    public pos: Vector2D = new Vector2D(0, 0);
 
-    constructor(id: number, type: EntityType, name?: string, pos?: Vector2) {
+    constructor(game: Game, id: number, type: EntityType, name?: string, pos?: Vector2D) {
+        this.game = game;
         this.id = id;
-
+        this.type = type;
         if (type == EntityType.LocalPlayer || type == EntityType.NetworkPlayer) {
             if (name) {
                 this.name = name;
@@ -50,20 +54,13 @@ export default class MapEntity {
             this.pos = pos;
         }
 
-        console.log(`Spawned entity '${name}:${this.id}' at position 'x:${this.pos.x}, y:${this.pos.y}'`);
+        console.log(`Spawned entity '${this.name}:${this.id}'(${this.type}) at position 'x:${this.pos.x}, y:${this.pos.y}'`);
     }
 
-    public occupiesPosition(position: Vector2): boolean {
+    public occupiesPosition(position: Vector2D): boolean {
         const a = Math.min(this.pos.x + this.width, position.x + this.width) - Math.max(this.pos.x, position.x);
         const b = Math.min(this.pos.y + this.height, position.y + this.height) - Math.max(this.pos.y, position.y);
         return (a >= 0) && (b >= 0);
 
-    }
-
-    public draw(drawContext: CanvasRenderingContext2D, offset: Vector2): void {
-        drawContext.fillStyle = '#FF0000';
-        drawContext.fillRect(this.pos.x - offset.x, this.pos.y - offset.y, this.width, this.height);
-        drawContext.fillStyle = '#FFFFFF';
-        drawContext.fillText(this.name, this.pos.x - offset.x, (this.pos.y - 8) - offset.y);
     }
 }

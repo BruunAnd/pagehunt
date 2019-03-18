@@ -1,15 +1,19 @@
-import Packet, { PacketType } from './packets/packet';
-import { EntityMovedPacket } from './packets/entity-moved';
-import { SpawnEntityPacket } from './packets/spawn-entity';
-import { RepositionPacket } from './packets/reposition';
-import {RemoveEntityPacket} from "./packets/remove-entity";
+import Packet, {PacketType} from './packets/packet';
+import EntityMovedPacket from './packets/entity-moved';
+import SpawnEntityPacket from './packets/spawn-entity';
+import RepositionPacket from './packets/reposition';
+import RemoveEntityPacket from "./packets/remove-entity";
+import HandshakePacket from "./packets/handshake";
+import MovementPacket from "./packets/movement";
+import {Game} from "./game";
+import Vector2D from "./vector2d";
 
 export default class NetworkClient {
     private socket: WebSocket;
+    private game: Game;
 
-    constructor(address: string,
-                private packetCallback: (Packet) => void,
-                private connectedCallback: () => void) {
+    constructor(game: Game, address: string) {
+        this.game = game;
         this.socket = new WebSocket(`ws://${address}`);
         this.socket.onopen = () => this.onOpen();
         this.socket.onmessage = (event) => this.onMessage(event);
@@ -17,7 +21,11 @@ export default class NetworkClient {
         this.socket.onerror = (event) => this.onError(event);
     }
 
-    public sendPacket(packet: Packet): void {
+    public sendPlayerMovement(movement: Vector2D): void {
+        this.sendPacket(new MovementPacket(movement));
+    }
+
+    private sendPacket(packet: Packet): void {
         this.socket.send(JSON.stringify(packet.dictify()));
     }
 
@@ -42,12 +50,27 @@ export default class NetworkClient {
         return null;
     }
 
+    private packetReceived(packet: Packet): void {
+        switch (packet.getType()) {
+            case PacketType.SpawnEntity:
+                return this.game.handleSpawnEntity(<SpawnEntityPacket> packet);
+            case PacketType.Reposition:
+                return this.game.handleReposition(<RepositionPacket> packet);
+            case PacketType.RemoveEntity:
+                return this.game.handleRemoveEntity(<RemoveEntityPacket> packet);
+        }
+    }
+
+    private onConnected(): void {
+        this.sendPacket(new HandshakePacket('Anders'));
+    }
+
     private onMessage(event): void {
-        this.packetCallback(this.constructPacket(JSON.parse(event.data)));
+        this.packetReceived(this.constructPacket(JSON.parse(event.data)));
     }
 
     private onOpen(): void {
-        this.connectedCallback();
+        this.onConnected();
     }
 
     private onClose(): void {

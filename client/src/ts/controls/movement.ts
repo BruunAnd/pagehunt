@@ -1,8 +1,15 @@
-import { Direction } from "./game";
-import Vector2 from "./vector2";
+import Vector2D from "../vector2d";
+
+export enum Direction {
+    None = 0,
+    Up = 1 << 0,    // 0001 -- the bitshift is unnecessary, but done for consistency
+    Down = 1 << 1,  // 0010
+    Left = 1 << 2,  // 0100
+    Right = 1 << 3, // 1000
+}
 
 export default class MovementController {
-    public static getNewLocation(currentPos: Vector2, angle: number, distance: number): Vector2 {
+    public static getNewLocation(currentPos: Vector2D, angle: number, distance: number): Vector2D {
         return this.calculateNewPosition(currentPos, angle, distance)
     }
 
@@ -39,7 +46,7 @@ export default class MovementController {
         }
     }
 
-    private static calculateNewPosition(currentPos: Vector2, degrees: number, distance: number): Vector2 {
-        return new Vector2(currentPos.x + distance * Math.cos(degrees * Math.PI / 180), currentPos.y + distance * Math.sin(degrees * Math.PI / 180));
+    private static calculateNewPosition(currentPos: Vector2D, degrees: number, distance: number): Vector2D {
+        return new Vector2D(currentPos.x + distance * Math.cos(degrees * Math.PI / 180), currentPos.y + distance * Math.sin(degrees * Math.PI / 180));
     }
 }

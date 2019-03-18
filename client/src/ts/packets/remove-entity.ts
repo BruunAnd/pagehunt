@@ -1,6 +1,6 @@
 import Packet, {PacketType} from './packet';
 
-export class RemoveEntityPacket extends Packet {
+export default class RemoveEntityPacket extends Packet {
     public id: number;
 
     constructor(packetDict: any) {
