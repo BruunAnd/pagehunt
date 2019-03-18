@@ -52,9 +52,12 @@ export default class NetworkClient {
 
     private packetReceived(packet: Packet): void {
         switch (packet.getType()) {
-            case PacketType.SpawnEntity: return this.game.handleSpawnEntity(<SpawnEntityPacket> packet);
-            case PacketType.Reposition: return this.game.handleReposition(<RepositionPacket> packet);
-            case PacketType.RemoveEntity: return this.game.handleRemoveEntity(<RemoveEntityPacket> packet);
+            case PacketType.SpawnEntity:
+                return this.game.handleSpawnEntity(<SpawnEntityPacket> packet);
+            case PacketType.Reposition:
+                return this.game.handleReposition(<RepositionPacket> packet);
+            case PacketType.RemoveEntity:
+                return this.game.handleRemoveEntity(<RemoveEntityPacket> packet);
         }
     }
 

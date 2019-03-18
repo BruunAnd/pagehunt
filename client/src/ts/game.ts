@@ -76,7 +76,7 @@ export class Game {
             this.map.addEntity(this.player);
             this.camera.setPosition(this.player.pos);
         } else {
-            const entity = new MapEntity(this, packet.id, EntityType.NetworkPlayer, packet.name, position);
+            const entity = new MapEntity(this, packet.id, packet.entity, packet.name, position);
             this.map.addEntity(entity);
         }
     }
