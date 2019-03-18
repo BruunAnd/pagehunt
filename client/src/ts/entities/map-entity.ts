@@ -1,5 +1,5 @@
 import Vector2D from "../vector2d";
-import { Game } from "../game";
+import {Game} from "../game";
 
 export enum EntityType {
     LocalPlayer = "LPlayer",
@@ -54,7 +54,7 @@ export default class MapEntity {
             this.pos = pos;
         }
 
-        console.log(`Spawned entity '${name}:${this.id}' at position 'x:${this.pos.x}, y:${this.pos.y}'`);
+        console.log(`Spawned entity '${this.name}:${this.id}'(${this.type}) at position 'x:${this.pos.x}, y:${this.pos.y}'`);
     }
 
     public occupiesPosition(position: Vector2D): boolean {

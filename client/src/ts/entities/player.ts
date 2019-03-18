@@ -2,16 +2,8 @@ import MapEntity, {EntityType} from "./map-entity";
 import Vector2D from "../vector2d";
 import GameMap from "../game-map";
 import Input from "../input";
-import MovementController from "../controls/movement";
+import MovementController, {Direction} from "../controls/movement";
 import {Game} from "../game";
-
-export enum Direction {
-    None = 0,
-    Up = 1 << 0,    // 0001 -- the bitshift is unnecessary, but done for consistency
-    Down = 1 << 1,  // 0010
-    Left = 1 << 2,  // 0100
-    Right = 1 << 3, // 1000
-}
 
 export default class Player extends MapEntity {
     hasLigth: boolean;
@@ -97,6 +89,7 @@ export default class Player extends MapEntity {
 
     private onCollision(other: MapEntity): boolean {
         /* This should NOT be on the client! Only on the server */
+        // TODO: Move server side
         switch (other.type) {
             case EntityType.Page:
                 //Collect and move

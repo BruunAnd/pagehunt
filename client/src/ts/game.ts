@@ -2,7 +2,7 @@ import Player from "./entities/player";
 import Input from "./input";
 import GameMap from "./game-map";
 import Vector2D from "./vector2d";
-import MapEntity, { EntityType } from "./entities/map-entity";
+import MapEntity, {EntityType} from "./entities/map-entity";
 import NetworkClient from './network';
 import SpawnEntityPacket from "./packets/spawn-entity";
 import RepositionPacket from "./packets/reposition";

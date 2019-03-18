@@ -1,11 +1,11 @@
-import Packet, { PacketType } from './packets/packet';
+import Packet, {PacketType} from './packets/packet';
 import EntityMovedPacket from './packets/entity-moved';
 import SpawnEntityPacket from './packets/spawn-entity';
 import RepositionPacket from './packets/reposition';
 import RemoveEntityPacket from "./packets/remove-entity";
 import HandshakePacket from "./packets/handshake";
 import MovementPacket from "./packets/movement";
-import { Game } from "./game";
+import {Game} from "./game";
 import Vector2D from "./vector2d";
 
 export default class NetworkClient {

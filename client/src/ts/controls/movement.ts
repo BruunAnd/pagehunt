@@ -1,5 +1,12 @@
-import { Direction } from "../entities/player";
 import Vector2D from "../vector2d";
+
+export enum Direction {
+    None = 0,
+    Up = 1 << 0,    // 0001 -- the bitshift is unnecessary, but done for consistency
+    Down = 1 << 1,  // 0010
+    Left = 1 << 2,  // 0100
+    Right = 1 << 3, // 1000
+}
 
 export default class MovementController {
     public static getNewLocation(currentPos: Vector2D, angle: number, distance: number): Vector2D {
