@@ -34,11 +34,7 @@ export class Game {
             Input.removeKey(event.key);
         });
         window.addEventListener('resize', () => {
-            this.renderer.canvas.forEach((value: HTMLCanvasElement) => {
-                value.width = window.innerWidth;
-                value.height = window.innerHeight;
-            });
-
+            this.renderer.onResize(window.innerWidth, window.innerHeight);
             this.camera.onResize(this.renderer.canvas.get('world'));
             this.camera.setPosition(this.player.pos);
         });
@@ -77,11 +73,11 @@ export class Game {
 
         if (packet.isSelf) {
             this.player = this.buildPlayer(packet.id, packet.name, position);
-            this.map.addEntity([this.player]);
+            this.map.addEntity(this.player);
             this.camera.setPosition(this.player.pos);
         } else {
             const entity = new MapEntity(this, packet.id, EntityType.NetworkPlayer, packet.name, position);
-            this.map.addEntity([entity]);
+            this.map.addEntity(entity);
         }
     }
 

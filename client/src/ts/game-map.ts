@@ -10,10 +10,8 @@ export default class GameMap {
         this.mapEntities = new Map<number, MapEntity>();
     }
 
-    public addEntity(entities: MapEntity[]): void {
-        for (const ent of entities) {
-            this.mapEntities.set(ent.id, ent);
-        }
+    public addEntity(entity: MapEntity): void {
+        this.mapEntities.set(entity.id, entity);
     }
 
     public getEntities(): MapEntity[] {

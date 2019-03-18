@@ -1,6 +1,5 @@
 import Vector2D from "../vector2d";
 import { Game } from "../game";
-import Renderer from "../renderer";
 
 export enum EntityType {
     LocalPlayer = "LPlayer",
@@ -24,7 +23,7 @@ export default class MapEntity {
     constructor(game: Game, id: number, type: EntityType, name?: string, pos?: Vector2D) {
         this.game = game;
         this.id = id;
-
+        this.type = type;
         if (type == EntityType.LocalPlayer || type == EntityType.NetworkPlayer) {
             if (name) {
                 this.name = name;
@@ -57,18 +56,6 @@ export default class MapEntity {
 
         console.log(`Spawned entity '${name}:${this.id}' at position 'x:${this.pos.x}, y:${this.pos.y}'`);
     }
-
-    public render(renderer: Renderer) {
-        const x = this.pos.x - this.game.camera.getPosition().x;
-        const y = this.pos.y - this.game.camera.getPosition().y;
-
-        renderer.ctx.get('world').beginPath();
-            renderer.ctx.get('world').fillStyle = '#AA0000';
-            renderer.ctx.get('world').fillRect(x, y, this.width, this.height);
-            renderer.ctx.get('world').fillStyle = '#FFFFFF';
-            renderer.ctx.get('world').fillText(this.name, x, y - 5);
-        renderer.ctx.get('world').closePath();
-    };
 
     public occupiesPosition(position: Vector2D): boolean {
         const a = Math.min(this.pos.x + this.width, position.x + this.width) - Math.max(this.pos.x, position.x);

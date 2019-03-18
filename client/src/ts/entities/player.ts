@@ -1,10 +1,9 @@
-import MapEntity, { EntityType } from "./map-entity";
+import MapEntity, {EntityType} from "./map-entity";
 import Vector2D from "../vector2d";
 import GameMap from "../game-map";
 import Input from "../input";
 import MovementController from "../controls/movement";
-import { Game } from "../game";
-import Renderer from "../renderer";
+import {Game} from "../game";
 
 export enum Direction {
     None = 0,
@@ -17,8 +16,8 @@ export enum Direction {
 export default class Player extends MapEntity {
     hasLigth: boolean;
     light: number;
-    lightDensity: number;
-    minLightLevel: number;
+    readonly lightDensity: number;
+    readonly minLightLevel: number;
 
     constructor(game: Game, id: number, name?: string, pos?: Vector2D) {
         if (name) {
@@ -44,18 +43,6 @@ export default class Player extends MapEntity {
         if (this.light < this.minLightLevel) {
             this.hasLigth = false;
         }
-    }
-
-    public render(renderer: Renderer) {
-        const x = this.pos.x - this.game.camera.getPosition().x;
-        const y = this.pos.y - this.game.camera.getPosition().y;
-
-        renderer.ctx.get('world').beginPath();
-            renderer.ctx.get('world').fillStyle = '#00AA00';
-            renderer.ctx.get('world').fillRect(x, y, this.width, this.height);
-            renderer.ctx.get('world').fillStyle = '#FFFFFF';
-            renderer.ctx.get('world').fillText(this.name, x, y - 5);
-        renderer.ctx.get('world').closePath();
     }
 
     public move(newPos: Vector2D, map: GameMap): Vector2D {

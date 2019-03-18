@@ -1,6 +1,6 @@
 import Util from "./util";
-import MapEntity from "./entities/map-entity";
-import { Game } from "./game";
+import MapEntity, {EntityType} from "./entities/map-entity";
+import {Game} from "./game";
 
 export default class Renderer {
     canvas: Map<string, HTMLCanvasElement> = new Map<string, HTMLCanvasElement>();
@@ -26,6 +26,13 @@ export default class Renderer {
         this.ctx.set('entity', entityCanvas.getContext('2d'));
 
         requestAnimationFrame(() => this.render());
+    }
+
+    public onResize(newWidth: number, newHeight: number) {
+        this.canvas.forEach((value: HTMLCanvasElement) => {
+            value.width = newWidth;
+            value.height = newHeight;
+        });
     }
 
     private render() {
@@ -81,9 +88,23 @@ export default class Renderer {
             // Don't draw stuff that is not near us
             if (ent.pos.distance(this.game.player.pos) > this.game.player.light + 100) {
                 return;
-            }
+            }// This will be server side eventually
 
-            ent.render(this);
+            const x = ent.pos.x - this.game.camera.getPosition().x;
+            const y = ent.pos.y - this.game.camera.getPosition().y;
+            this.ctx.get('world').beginPath();
+                switch (ent.type) {
+                case EntityType.LocalPlayer:
+                    this.ctx.get('world').fillStyle = '#00AA00';
+                    break;
+                default:
+                    this.ctx.get('world').fillStyle = '#AA0000';
+                    break;
+                }
+                this.ctx.get('world').fillRect(x, y, ent.width, ent.height);
+                this.ctx.get('world').fillStyle = '#FFFFFF';
+                this.ctx.get('world').fillText(ent.name, x, y - 5);
+            this.ctx.get('world').closePath();
         });
 
         this.ctx.get('world').drawImage(this.canvas.get('fog'), 0, 0);
