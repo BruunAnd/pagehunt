@@ -1,10 +1,21 @@
 from server.network.packets.entity.reposition_packet import RepositionPacket
+from enum import IntEnum
+
+
+class EntityType(IntEnum):
+    LocalPlayer = 0,
+    NetworkPlayer = 1,
+    Slender = 2,
+    Page = 3,
+    Light = 4,
+    Tree = 5
 
 
 class Entity:
-    def __init__(self, game, id, initial_x, initial_y):
+    def __init__(self, game, id, type, initial_x, initial_y):
         self.id = id
         self.game = game
+        self.type = type
         self.x = initial_x
         self.y = initial_y
         self.width = 32

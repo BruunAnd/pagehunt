@@ -2,14 +2,10 @@ import Packet, {PacketType} from './packet';
 
 export default class HandshakePacket extends Packet {
     constructor(private name: string) {
-        super();
+        super(PacketType.Handshake);
     }
 
     public dictify(): any {
-        return {'type': this.getType(), 'name': this.name};
-    }
-
-    public getType(): PacketType {
-        return PacketType.Handshake;
+        return {'type': this.packetType, 'name': this.name};
     }
 }

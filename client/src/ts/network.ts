@@ -51,7 +51,7 @@ export default class NetworkClient {
     }
 
     private packetReceived(packet: Packet): void {
-        switch (packet.getType()) {
+        switch (packet.packetType) {
             case PacketType.SpawnEntity:
                 return this.game.handleSpawnEntity(<SpawnEntityPacket> packet);
             case PacketType.Reposition:
@@ -63,6 +63,7 @@ export default class NetworkClient {
 
     private onConnected(): void {
         this.sendPacket(new HandshakePacket('Anders'));
+        console.log(`Connected to game server on '${this.socket.url}'`);
     }
 
     private onMessage(event): void {

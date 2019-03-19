@@ -1,30 +1,34 @@
 import Player from "./entities/player";
 import Input from "./input";
-import GameMap from "./game-map";
+import World from "./world";
 import Vector2D from "./vector2d";
-import MapEntity, {EntityType} from "./entities/map-entity";
+import Transform from "./transform";
+import Entity from "./entities/entity";
 import NetworkClient from './network';
 import SpawnEntityPacket from "./packets/spawn-entity";
 import RepositionPacket from "./packets/reposition";
 import RemoveEntityPacket from "./packets/remove-entity";
 import Camera from "./camera";
 import Renderer from "./renderer";
+import {EntityType} from "./entities/entity";
+import NetworkPlayer from "./entities/network-player";
 
 export class Game {
     tickrate: number = 40;
     player: Player;
-    map: GameMap;
+    world: World;
     lastTickTime: number = Date.now();
     tickInterval: number;
     enableInput: boolean = false;
     networkClient: NetworkClient;
     camera: Camera;
     renderer: Renderer;
+    lastPlayerPos: Vector2D;
     
     constructor(canvasId: string) {
         this.networkClient = new NetworkClient(this, 'localhost:4000');
         this.renderer = new Renderer(this, canvasId);
-        this.map = this.buildMap(); // TODO: Get map from server
+        this.world = this.buildMap(); // TODO: Get world from server
         this.camera = new Camera(new Vector2D(0, 0), this.renderer.canvas.get('world'));
 
         document.addEventListener('keydown', (event) => {
@@ -36,7 +40,8 @@ export class Game {
         window.addEventListener('resize', () => {
             this.renderer.onResize(window.innerWidth, window.innerHeight);
             this.camera.onResize(this.renderer.canvas.get('world'));
-            this.camera.setPosition(this.player.pos);
+            if (this.player)
+                this.camera.setPosition(this.player.transform.position);
         });
 
         //Start the game loop
@@ -44,17 +49,14 @@ export class Game {
         this.enableInput = true;
     }
 
-    private buildMap(): GameMap {
-        //Receive map from server
-        return new GameMap(new Vector2D(2000, 2000));
+    private buildMap(): World {
+        return new World(new Vector2D(2000, 2000));
     }
 
-    private buildPlayer(id: number, name: string, pos?: Vector2D): Player {
-        if (pos) {
-            return new Player(this, id, name, pos);
-        } else {
-            return new Player(this, id, name);
-        }
+    private buildPlayer(id: number, name: string, transform?: Transform): Player {
+        const ply = new Player(id, null, this.world, name, transform != null ? transform: null);
+        this.lastPlayerPos = ply.transform.position;
+        return ply;
     }
 
     private tick(): void {
@@ -62,36 +64,53 @@ export class Game {
         let dt = ((Date.now() - this.lastTickTime) / 1000) * 20;
         this.lastTickTime = tickTime;
 
-        if (this.player)
-            this.player.tick(dt);
-        if (this.camera)
-            this.camera.tick(dt);
+        if (!this.world)
+            return;
+        if (!this.player)
+            return;
+        if (!this.camera)
+            return;
+
+        this.world.getAllEntities().forEach(function (entity: Entity) {
+            entity.tick(dt);
+        });
+
+        this.camera.setPosition(this.player.transform.position);
+        // Only send movement updates if we have actually moved
+        if (this.player.transform.position.distance(this.lastPlayerPos) > 0.5) {
+            console.log("Sending movement packet");
+            this.networkClient.sendPlayerMovement(this.player.transform.position);
+        }
+        this.lastPlayerPos = this.player.transform.position;
+        this.camera.tick(dt);
     }
 
     public handleSpawnEntity(packet: SpawnEntityPacket): void {
-        const position = new Vector2D(packet.x, packet.y);
+        const transform = new Transform(packet.x, packet.y, 32, 32);
+        let entity: Entity;
 
-        if (packet.isSelf) {
-            this.player = this.buildPlayer(packet.id, packet.name, position);
-            this.map.addEntity(this.player);
-            this.camera.setPosition(this.player.pos);
-        } else {
-            const entity = new MapEntity(this, packet.id, packet.entity, packet.name, position);
-            this.map.addEntity(entity);
+        switch (packet.entity) {
+            case EntityType.LocalPlayer:
+                entity = this.player = this.buildPlayer(packet.id, packet.name, transform);
+                this.camera.setPosition(transform.position);
+                break;
+            default:
+                entity = new NetworkPlayer(packet.id, null, this.world, packet.name, transform);
         }
+        this.world.addEntity(entity);
     }
 
     public handleReposition(packet: RepositionPacket): void {
-        this.map.getEntities().forEach(function (ent: MapEntity) {
+        this.world.getAllEntities().forEach(function (ent: Entity) {
             if (ent.id === packet.id) {
-                ent.pos = new Vector2D(packet.x, packet.y);
+                ent.transform.position = new Vector2D(packet.x, packet.y);
             }
         });
     }
 
     public handleRemoveEntity(packet: RemoveEntityPacket) {
         console.log(`Player ${packet.id} disconnected!`);
-        this.map.removeEntity(packet.id);
+        this.world.removeEntity(packet.id);
     }
 }
 
