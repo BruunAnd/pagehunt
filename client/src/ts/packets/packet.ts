@@ -1,6 +1,11 @@
 export default abstract class Packet {
-    public abstract dictify(): any;
-    public abstract getType(): PacketType;
+    abstract dictify(): any;
+    readonly packetType: PacketType;
+
+    constructor(packetType: PacketType) {
+        this.packetType = packetType;
+    }
+
 }
 
 export enum PacketType {

@@ -1,5 +1,5 @@
 import Util from "./util";
-import MapEntity, {EntityType} from "./entities/map-entity";
+import Entity, {EntityType} from "./entities/entity";
 import {Game} from "./game";
 
 export default class Renderer {
@@ -38,24 +38,28 @@ export default class Renderer {
     private render() {
         if (!this.game.camera) {
             requestAnimationFrame(() => this.render());
+            console.log("No camera found!");
             return;
         }
-        if (!this.game.map) {
+        if (!this.game.world) {
             requestAnimationFrame(() => this.render());
+            console.log("No world found!");
             return;
         }
         if (!this.game.player) {
             requestAnimationFrame(() => this.render());
+            console.log("No player found!");
             return;
         }
+        console.log("Rendering..");
         this.ctx.get('world').clearRect(0, 0, this.canvas.get('world').width, this.canvas.get('world').height);
 
         // (Re)draw fog of war
         this.ctx.get('fog').fillStyle = '#000000';
         this.ctx.get('fog').fillRect(0, 0, this.canvas.get('fog').width, this.canvas.get('fog').height);
 
-        const x = (this.game.player.pos.x + this.game.player.width / 2) - this.game.camera.getPosition().x;
-        const y = (this.game.player.pos.y + this.game.player.height / 2) - this.game.camera.getPosition().y;
+        const x = (this.game.player.getPosition().x + this.game.player.transform.width / 2) - this.game.camera.getPosition().x;
+        const y = (this.game.player.getPosition().y + this.game.player.transform.height / 2) - this.game.camera.getPosition().y;
         const lightMin = this.game.player.light - 10;
         const lightMax = this.game.player.light + 10;
 
@@ -84,14 +88,14 @@ export default class Renderer {
         this.ctx.get('fog').globalCompositeOperation = 'source-over';
         this.ctx.get('fog').closePath();
 
-        this.game.map.getEntities().forEach((ent: MapEntity) => {
+        this.game.world.getAllEntities().forEach((ent: Entity) => {
             // Don't draw stuff that is not near us
-            if (ent.pos.distance(this.game.player.pos) > this.game.player.light + 100) {
+            if (ent.getPosition().distance(this.game.player.getPosition()) > this.game.player.light + 100) {
                 return;
             }// This will be server side eventually
 
-            const x = ent.pos.x - this.game.camera.getPosition().x;
-            const y = ent.pos.y - this.game.camera.getPosition().y;
+            const x = ent.getPosition().x - this.game.camera.getPosition().x;
+            const y = ent.getPosition().y - this.game.camera.getPosition().y;
             this.ctx.get('world').beginPath();
                 switch (ent.type) {
                 case EntityType.LocalPlayer:
@@ -101,7 +105,7 @@ export default class Renderer {
                     this.ctx.get('world').fillStyle = '#AA0000';
                     break;
                 }
-                this.ctx.get('world').fillRect(x, y, ent.width, ent.height);
+                this.ctx.get('world').fillRect(x, y, ent.transform.width, ent.transform.height);
                 this.ctx.get('world').fillStyle = '#FFFFFF';
                 this.ctx.get('world').fillText(ent.name, x, y - 5);
             this.ctx.get('world').closePath();
