@@ -11,7 +11,8 @@ import RemoveEntityPacket from "./packets/remove-entity";
 import Camera from "./camera";
 import Renderer from "./renderer";
 import NetworkPlayer from "./entities/network-player";
-import AudioManager, {AudioFile} from "./audio";
+import AudioManager from "./audio";
+import util from "./util";
 
 export class Game {
     tickrate: number = 40;
@@ -78,9 +79,15 @@ export class Game {
         });
 
         if (this.player.isMoving)
-            this.audioManager.playAudio(AudioFile.Footsteps);
+        {
+            const rnd = util.getRandomRange(0, 100);
+            console.log(rnd);
+            if (rnd > 99)
+                this.audioManager.playAudio("branch");
+            this.audioManager.playAudio("footsteps");
+        }
         else
-            this.audioManager.stopAudio(AudioFile.Footsteps);
+            this.audioManager.stopAudio("footsteps");
 
         this.camera.setPosition(this.player.transform.position);
         // Only send movement updates if we have actually moved
