@@ -3,20 +3,21 @@ import Input from "./input";
 import World from "./world";
 import Vector2D from "./vector2d";
 import Transform from "./transform";
-import Entity from "./entities/entity";
+import Entity, {EntityType} from "./entities/entity";
 import NetworkClient from './network';
 import SpawnEntityPacket from "./packets/spawn-entity";
 import RepositionPacket from "./packets/reposition";
 import RemoveEntityPacket from "./packets/remove-entity";
 import Camera from "./camera";
 import Renderer from "./renderer";
-import {EntityType} from "./entities/entity";
 import NetworkPlayer from "./entities/network-player";
+import AudioManager, {AudioFile} from "./audio";
 
 export class Game {
     tickrate: number = 40;
     player: Player;
     world: World;
+    audioManager: AudioManager;
     lastTickTime: number = Date.now();
     tickInterval: number;
     enableInput: boolean = false;
@@ -30,6 +31,7 @@ export class Game {
         this.renderer = new Renderer(this, canvasId);
         this.world = this.buildMap(); // TODO: Get world from server
         this.camera = new Camera(new Vector2D(0, 0), this.renderer.canvas.get('world'));
+        this.audioManager = new AudioManager();
 
         document.addEventListener('keydown', (event) => {
             Input.addKey(event.key);
@@ -75,10 +77,14 @@ export class Game {
             entity.tick(dt);
         });
 
+        if (this.player.isMoving)
+            this.audioManager.playAudio(AudioFile.Footsteps);
+        else
+            this.audioManager.stopAudio(AudioFile.Footsteps);
+
         this.camera.setPosition(this.player.transform.position);
         // Only send movement updates if we have actually moved
         if (this.player.transform.position.distance(this.lastPlayerPos) > 0.5) {
-            console.log("Sending movement packet");
             this.networkClient.sendPlayerMovement(this.player.transform.position);
         }
         this.lastPlayerPos = this.player.transform.position;

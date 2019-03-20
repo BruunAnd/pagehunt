@@ -7,6 +7,7 @@ import Transform from "../transform";
 
 export default class Player extends Entity {
     hasLigth: boolean;
+    isMoving: boolean;
     light: number;
     readonly lightDensity: number;
     readonly minLightLevel: number;
@@ -124,6 +125,7 @@ export default class Player extends Entity {
         }
 
         if (dir != Direction.None) {
+            this.isMoving = true;
             const moveSpeed = 10;
             const angle = MovementController.getDegreesFromDirection(dir);
 
@@ -132,6 +134,7 @@ export default class Player extends Entity {
                 return this.move(newLocation);
             }
         }
+        this.isMoving = false;
         return null;
     }
 }
