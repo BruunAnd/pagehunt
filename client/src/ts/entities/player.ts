@@ -1,26 +1,18 @@
-import MapEntity, {EntityType} from "./map-entity";
 import Vector2D from "../vector2d";
-import GameMap from "../game-map";
+import World from "../world";
 import Input from "../input";
 import MovementController, {Direction} from "../controls/movement";
-import {Game} from "../game";
+import Entity, {EntityType} from "./entity";
+import Transform from "../transform";
 
-export default class Player extends MapEntity {
+export default class Player extends Entity {
     hasLigth: boolean;
     light: number;
     readonly lightDensity: number;
     readonly minLightLevel: number;
 
-    constructor(game: Game, id: number, name?: string, pos?: Vector2D) {
-        if (name) {
-            if (pos) {
-                super(game, id, EntityType.LocalPlayer, name, pos);
-            } else {
-                super(game, id, EntityType.LocalPlayer, name);
-            }
-        } else {
-            super(game, id, EntityType.LocalPlayer);
-        }
+    constructor(id: number, sprite: HTMLImageElement, world: World, name?: string, transform?: Transform) {
+        super(id, EntityType.LocalPlayer, sprite, world, name != null ? name : "Unknown Player", transform);
         this.hasLigth = true;
         this.light = 300;
         this.lightDensity = .4;
@@ -37,7 +29,7 @@ export default class Player extends MapEntity {
         }
     }
 
-    public move(newPos: Vector2D, map: GameMap): Vector2D {
+    public move(newPos: Vector2D): Vector2D {
         let correctX: number = newPos.x;
         let correctY: number = newPos.y;
         //Check if we are trying to move out of the map
@@ -49,26 +41,26 @@ export default class Player extends MapEntity {
             //newPos is above the map boundary
             correctY = 1;
         }
-        if ((newPos.x + this.width) > map.mapSize.x) {
+        if ((newPos.x + this.transform.width) > this.world.worldSize.x) {
             //newPos is to the right of the map boundary
-            correctX = map.mapSize.x - (this.width + 1);
+            correctX = this.world.worldSize.x - (this.transform.width + 1);
         }
-        if ((newPos.y + this.height) > map.mapSize.y) {
+        if ((newPos.y + this.transform.height) > this.world.worldSize.y) {
             //newPos is below the map boundary
-            correctY = map.mapSize.y - (this.height + 1);
+            correctY = this.world.worldSize.y - (this.transform.height + 1);
         }
 
-        let correctPos = new Vector2D(correctX, correctY);
+        const correctPos = new Vector2D(correctX, correctY);
         if (!newPos.equals(correctPos)) {
             console.log("Collided with map boundary");
-            this.pos = correctPos;
+            this.transform.position = correctPos;
             return correctPos;
         }
 
         let canMove: boolean = true;
 
         //Preliminary collision checking
-        for (let ent of map.getEntities()) {
+        for (let ent of this.world.getAllEntities()) {
             if (ent.occupiesPosition(newPos)) {
                 if (ent.id == this.id)
                     continue;
@@ -80,20 +72,19 @@ export default class Player extends MapEntity {
         }
 
         if (canMove) {
-            this.pos = newPos;
+            this.transform.position = newPos;
             return newPos;
         }
 
-        return this.pos;
+        return this.transform.position;
     }
 
-    private onCollision(other: MapEntity): boolean {
+    private onCollision(other: Entity): boolean {
         /* This should NOT be on the client! Only on the server */
         // TODO: Move server side
         switch (other.type) {
             case EntityType.Page:
                 //Collect and move
-                //
                 return true;
             case EntityType.Slender:
                 //Death
@@ -104,7 +95,7 @@ export default class Player extends MapEntity {
         }
     }
 
-    private checkMovement(dt: number): void {
+    private checkMovement(dt: number): Vector2D {
         let dir: Direction = Direction.None;
 
         if (Input.getKey("w")) {
@@ -137,11 +128,10 @@ export default class Player extends MapEntity {
             const angle = MovementController.getDegreesFromDirection(dir);
 
             if (angle != -1) {
-                const newLocation = MovementController.getNewLocation(this.pos, angle, moveSpeed * dt);
-                const actualNewLocation = this.game.player.move(newLocation, this.game.map);
-                this.game.networkClient.sendPlayerMovement(actualNewLocation);
-                this.game.camera.setPosition(this.game.player.pos);
+                const newLocation = MovementController.getNewLocation(this.transform.position, angle, moveSpeed * dt);
+                return this.move(newLocation);
             }
         }
+        return null;
     }
 }

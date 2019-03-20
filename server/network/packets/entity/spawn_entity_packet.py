@@ -4,15 +4,15 @@ from server.network.packets.packet_base import Packet
 
 
 class SpawnEntityPacket(Packet):
-    def __init__(self, is_self: bool, entity):
-        self.is_self = is_self
+    def __init__(self, entity_type, entity):
+        self.entity_type = entity_type
         self.entity = entity
 
         if isinstance(self.entity, Player):
             self.name = self.entity.name
 
     def dictify(self):
-        values = dict(type=self.get_type(), id=self.entity.id, isSelf=self.is_self, x=self.entity.x,
+        values = dict(type=self.get_type(), id=self.entity.id, entity=self.entity_type, x=self.entity.x,
                       y=self.entity.y)
 
         if self.name:

@@ -6,7 +6,7 @@ export default class RepositionPacket extends Packet {
     public id: number;
 
     constructor(packetDict: any) {
-        super();
+        super(PacketType.Reposition);
 
         this.x = packetDict['x'];
         this.y = packetDict['y'];
@@ -15,9 +15,5 @@ export default class RepositionPacket extends Packet {
 
     public dictify(): any {
         throw 5;
-    }
-
-    public getType(): PacketType {
-        return PacketType.Reposition;
     }
 }

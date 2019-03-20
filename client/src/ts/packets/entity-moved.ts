@@ -5,7 +5,7 @@ export default class EntityMovedPacket extends Packet {
     public y: number;
 
     constructor(packetDict: any) {
-        super();
+        super(PacketType.EntityMoved);
 
         this.x = packetDict['x'];
         this.y = packetDict['y'];
@@ -13,9 +13,5 @@ export default class EntityMovedPacket extends Packet {
 
     public dictify(): string {
         throw 42;
-    }
-
-    public getType(): PacketType {
-        return PacketType.EntityMoved;
     }
 }
