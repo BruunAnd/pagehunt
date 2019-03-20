@@ -1,9 +1,9 @@
-client/.vs/
-
+# IDE stuff
 \.idea/
-
 \.vscode/
-
 \.vs/
 
-client/package-lock\.json
+# Docker stuff
+.dockerignore
+Dockerfile
+pagehunt.conf
