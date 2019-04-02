@@ -8,15 +8,19 @@ import Transform from "../transform";
 export default class Player extends Entity {
     hasLigth: boolean;
     light: number;
+    world: World;
     readonly lightDensity: number;
     readonly minLightLevel: number;
 
     constructor(id: number, sprite: HTMLImageElement, world: World, name?: string, transform?: Transform) {
-        super(id, EntityType.LocalPlayer, sprite, world, name != null ? name : "Unknown Player", transform);
+        super(id, EntityType.LocalPlayer, sprite, name != null ? name : "Unknown Player", transform);
+        this.world = world;
         this.hasLigth = true;
         this.light = 300;
         this.lightDensity = .4;
         this.minLightLevel = 200;
+
+        console.log(this.world);
     }
 
     public tick(dt: number): void {
@@ -80,8 +84,6 @@ export default class Player extends Entity {
     }
 
     private onCollision(other: Entity): boolean {
-        /* This should NOT be on the client! Only on the server */
-        // TODO: Move server side
         switch (other.type) {
             case EntityType.Page:
                 //Collect and move

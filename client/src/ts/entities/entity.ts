@@ -1,29 +1,33 @@
 import Vector2D from "../vector2d";
 import Transform from "../transform";
-import World from "../world";
+import Tree from "./tree";
+import Light from "./light";
+import Page from "./page";
+import NetworkPlayer from "./network-player";
+import Slender from "./slender";
 
 export enum EntityType {
-    LocalPlayer = 0,
-    NetworkPlayer = 1,
-    Slender = 2,
-    Page = 3,
-    Light = 4,
-    Tree = 5
+    Player = 10,
+    Slender = 11,
+    Page = 12,
+    Light = 13,
+    Fireball = 14,
+    Tree = 15,
+    LocalPlayer = 20,
+    NetworkPlayer = 21
 }
 
 export default abstract class Entity {
-    readonly world: World;
-    readonly sprite: HTMLImageElement = null;
     readonly id: number;
     readonly type: EntityType;
+    readonly sprite: HTMLImageElement = null;
     readonly name: string;
     readonly transform: Transform;
 
-    protected constructor(id: number, type: EntityType, sprite: HTMLImageElement, world: World, name: string, transform?: Transform) {
+    protected constructor(id: number, type: EntityType, sprite: HTMLImageElement, name: string, transform?: Transform) {
         this.id = id;
         this.type = type;
         this.sprite = sprite;
-        this.world = world;
         this.name = name;
         this.transform = transform != null ? transform : new Transform(10,10, 32, 32);
     }

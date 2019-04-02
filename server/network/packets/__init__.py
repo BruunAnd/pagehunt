@@ -7,4 +7,5 @@ class PacketType(IntEnum):
     SpawnEntity = 2,
     Movement = 3,
     Reposition = 4,
-    RemoveEntity = 5
+    RemoveEntity = 5,
+    WorldTransfer = 6

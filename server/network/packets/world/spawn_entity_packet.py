@@ -1,4 +1,4 @@
-from server.game.player import Player
+from server.game.entities.player import Player
 from server.network.packets import PacketType
 from server.network.packets.packet_base import Packet
 

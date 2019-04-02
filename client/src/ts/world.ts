@@ -1,9 +1,16 @@
 import Vector2D from './vector2d';
-import Entity from './entities/entity';
+import Entity, {EntityType} from './entities/entity';
+import Transform from "./transform";
+import Tree from "./entities/tree";
+import NetworkPlayer from "./entities/network-player";
+import Light from "./entities/light";
+import Page from "./entities/page";
+import Slender from "./entities/slender";
+import Player from "./entities/player";
 
 export default class World {
-    worldSize: Vector2D;
-    worldEntities: Map<number, Entity>;
+    readonly worldSize: Vector2D;
+    private worldEntities: Map<number, Entity>;
 
     constructor(size: Vector2D) {
         this.worldSize = size;
@@ -33,5 +40,27 @@ export default class World {
 
         this.worldEntities.delete(id);
         console.log(`Despawned entity with ID '${id}'.`);
+    }
+
+    public constructEntity(entity: any): Entity {
+        const entity_type: EntityType = entity['type'];
+        const id: number = entity['id'];
+        const transform = new Transform(entity['x'], entity['y'], 32, 32);
+        const name: string = entity['name'] ? entity['name'] : null;
+
+        switch (entity_type) {
+            case EntityType.Tree:
+                return new Tree(id, null, transform);
+            case EntityType.Player || EntityType.NetworkPlayer:
+                return new NetworkPlayer(id, null, name, transform);
+            case EntityType.Light:
+                return new Light(id, null, 20, transform);
+            case EntityType.Page:
+                return new Page(id, null, transform);
+            case EntityType.LocalPlayer:
+                return new Player(id, null, this, name, transform);
+            default:
+                return new Slender(id, null, transform);
+        }
     }
 }

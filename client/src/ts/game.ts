@@ -3,15 +3,14 @@ import Input from "./input";
 import World from "./world";
 import Vector2D from "./vector2d";
 import Transform from "./transform";
-import Entity from "./entities/entity";
+import Entity, {EntityType} from "./entities/entity";
 import NetworkClient from './network';
 import SpawnEntityPacket from "./packets/spawn-entity";
 import RepositionPacket from "./packets/reposition";
 import RemoveEntityPacket from "./packets/remove-entity";
 import Camera from "./camera";
 import Renderer from "./renderer";
-import {EntityType} from "./entities/entity";
-import NetworkPlayer from "./entities/network-player";
+import WorldTransferPacket from "./packets/world-transfer";
 
 export class Game {
     tickrate: number = 40;
@@ -28,7 +27,6 @@ export class Game {
     constructor(canvasId: string) {
         this.networkClient = new NetworkClient(this, 'localhost:4000');
         this.renderer = new Renderer(this, canvasId);
-        this.world = this.buildMap(); // TODO: Get world from server
         this.camera = new Camera(new Vector2D(0, 0), this.renderer.canvas.get('world'));
 
         document.addEventListener('keydown', (event) => {
@@ -47,10 +45,6 @@ export class Game {
         //Start the game loop
         this.tickInterval = setInterval(() => this.tick(), 1000/this.tickrate);
         this.enableInput = true;
-    }
-
-    private buildMap(): World {
-        return new World(new Vector2D(2000, 2000));
     }
 
     private buildPlayer(id: number, name: string, transform?: Transform): Player {
@@ -86,18 +80,40 @@ export class Game {
     }
 
     public handleSpawnEntity(packet: SpawnEntityPacket): void {
-        const transform = new Transform(packet.x, packet.y, 32, 32);
+        /*const transform = new Transform(packet.x, packet.y, 32, 32);
         let entity: Entity;
 
         switch (packet.entity) {
+            case EntityType.NetworkPlayer:
+                entity = new NetworkPlayer(packet.id, null, packet.name, transform);
+                break;
             case EntityType.LocalPlayer:
                 entity = this.player = this.buildPlayer(packet.id, packet.name, transform);
                 this.camera.setPosition(transform.position);
                 break;
+            case EntityType.Light:
+                entity = new Light(packet.id, null, 20, transform);
+                break;
+            case EntityType.Slender:
+                entity = new Slender(packet.id, null, transform);
+                break;
             default:
-                entity = new NetworkPlayer(packet.id, null, this.world, packet.name, transform);
+                entity = new Tree(packet.id, null, transform)
+        }*/
+
+        if (packet.entity == EntityType.LocalPlayer) {
+            const transform = new Transform(packet.x, packet.y, 32, 32);
+            this.player = this.buildPlayer(packet.id, packet.name, transform);
+            this.camera.setPosition(transform.position);
+            this.world.addEntity(this.player);
         }
-        this.world.addEntity(entity);
+        else {
+            this.world.addEntity(this.world.constructEntity(packet));
+        }
+    }
+
+    public handleWorldReceived(packet: WorldTransferPacket): void {
+        this.world = packet.world;
     }
 
     public handleReposition(packet: RepositionPacket): void {
