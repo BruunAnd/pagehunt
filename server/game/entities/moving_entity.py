@@ -4,19 +4,19 @@ from server.network.packets.entity.reposition_packet import RepositionPacket
 
 class MovingEntity(Entity):
     def __init__(self, world, type, initial_x, initial_y, move_speed):
-        super().__init__(world, type, initial_x, initial_y)
+        super().__init__(world, type, True, initial_x, initial_y)
         self.moveSpeed = move_speed
 
     def confirm_movement(self, x, y):
         if not self.can_move(x, y):
-            print(f"{self.id} attempted to move to ({x}, {y}) from ({self.x}, {self.y}) illegally!")
+            print(f"{self.id} attempted to move to {(x, y)} from {(self.x,self.y)} illegally!")
             return False
 
         if self.crossed_map_boundary(x, y):
             print(f"{self.id} attempted to move outside the map!")
 
-        if self.location_occupied(x, y):
-            print(f"{self.id} attempted to move to ({x}, {y}), but the location was occupied!")
+        if self.location_blocked(x, y):
+            print(f"{self.id} attempted to move to {(x, y)}, but the location was blocked!")
             return False
 
         return True
@@ -28,7 +28,12 @@ class MovingEntity(Entity):
         return x < 0 or y < 0 or x > self.world.world_size or y > self.world.world_size
 
     async def move(self, server, x, y):
+        if self.confirm_movement(x, y):
+            # If movement is legit, update location information
+            # Otherwise send the current location to tell the client to return
+            self.x = x
+            self.y = y
+
         # Broadcast movement packet
-        self.x = x
-        self.y = y
+        # TODO: Insert some kind of delay for this as this may be the cause of weird movement
         await server.broadcast_packet(RepositionPacket(self))

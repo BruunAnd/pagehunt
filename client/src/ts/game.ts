@@ -47,8 +47,8 @@ export class Game {
         this.enableInput = true;
     }
 
-    private buildPlayer(id: number, name: string, transform?: Transform): Player {
-        const ply = new Player(id, null, this.world, name, transform != null ? transform: null);
+    private buildPlayer(id: number, moveSpeed: number, name: string, transform?: Transform): Player {
+        const ply = new Player(id, null, this.world, moveSpeed, name, transform != null ? transform: null);
         this.lastPlayerPos = ply.transform.position;
         return ply;
     }
@@ -103,7 +103,7 @@ export class Game {
 
         if (packet.entity == EntityType.LocalPlayer) {
             const transform = new Transform(packet.x, packet.y, 32, 32);
-            this.player = this.buildPlayer(packet.id, packet.name, transform);
+            this.player = this.buildPlayer(packet.id, packet.speed, packet.name, transform);
             this.camera.setPosition(transform.position);
             this.world.addEntity(this.player);
         }

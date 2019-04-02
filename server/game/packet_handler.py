@@ -14,8 +14,7 @@ class PacketHandler:
 
     async def handle_movement(self, client, packet: MovementPacket):
         player = self.game.client_player_map[client]
-        if player.confirm_movement(packet.x, packet.y):
-            await player.move(self.sockets_server, packet.x, packet.y)
+        await player.move(self.sockets_server, packet.x, packet.y)
 
     async def handle_handshake(self, client, packet: HandshakePacket):
         # Initialize player

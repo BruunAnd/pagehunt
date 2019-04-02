@@ -6,7 +6,6 @@ import NetworkPlayer from "./entities/network-player";
 import Light from "./entities/light";
 import Page from "./entities/page";
 import Slender from "./entities/slender";
-import Player from "./entities/player";
 
 export default class World {
     readonly worldSize: Vector2D;
@@ -58,7 +57,8 @@ export default class World {
             case EntityType.Page:
                 return new Page(id, null, transform);
             case EntityType.LocalPlayer:
-                return new Player(id, null, this, name, transform);
+                console.error("Local player is not a valid entity to be constructed by using the World.constructEntity function");
+                return null;
             default:
                 return new Slender(id, null, transform);
         }

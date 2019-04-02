@@ -10,6 +10,7 @@ class SpawnEntityPacket(Packet):
 
         if isinstance(self.entity, Player):
             self.name = self.entity.name
+            self.moveSpeed = self.entity.moveSpeed
 
     def dictify(self):
         values = dict(type=self.get_type(), id=self.entity.id, entity=self.entity_type, x=self.entity.x,
@@ -17,6 +18,8 @@ class SpawnEntityPacket(Packet):
 
         if self.name:
             values['name'] = self.name
+        if self.moveSpeed:
+            values['speed'] = self.moveSpeed
 
         return values
 

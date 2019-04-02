@@ -9,18 +9,18 @@ export default class Player extends Entity {
     hasLigth: boolean;
     light: number;
     world: World;
+    moveSpeed: number;
     readonly lightDensity: number;
     readonly minLightLevel: number;
 
-    constructor(id: number, sprite: HTMLImageElement, world: World, name?: string, transform?: Transform) {
+    constructor(id: number, sprite: HTMLImageElement, world: World, moveSpeed: number, name?: string, transform?: Transform) {
         super(id, EntityType.LocalPlayer, sprite, name != null ? name : "Unknown Player", transform);
         this.world = world;
         this.hasLigth = true;
         this.light = 300;
         this.lightDensity = .4;
         this.minLightLevel = 200;
-
-        console.log(this.world);
+        this.moveSpeed = moveSpeed;
     }
 
     public tick(dt: number): void {
@@ -91,6 +91,8 @@ export default class Player extends Entity {
             case EntityType.Slender:
                 //Death
                 return true;
+            case EntityType.Tree:
+                return true;
             default:
                 //Blocked
                 return false;
@@ -126,11 +128,10 @@ export default class Player extends Entity {
         }
 
         if (dir != Direction.None) {
-            const moveSpeed = 10;
             const angle = MovementController.getDegreesFromDirection(dir);
 
             if (angle != -1) {
-                const newLocation = MovementController.getNewLocation(this.transform.position, angle, moveSpeed * dt);
+                const newLocation = MovementController.getNewLocation(this.transform.position, angle, this.moveSpeed * dt);
                 return this.move(newLocation);
             }
         }

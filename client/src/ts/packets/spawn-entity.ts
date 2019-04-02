@@ -8,6 +8,7 @@ export default class SpawnEntityPacket extends Packet {
     public entity: EntityType;
     public isSelf: boolean;
     public name: string;
+    public speed: number;
 
     constructor(packetDict: any) {
         super(PacketType.SpawnEntity);
@@ -16,10 +17,8 @@ export default class SpawnEntityPacket extends Packet {
         this.y = packetDict['y'];
         this.id = packetDict['id'];
         this.entity = packetDict['entity'];
-
-        if ('name' in packetDict) {
-            this.name = packetDict['name'];
-        }
+        this.speed = packetDict['speed'] || null;
+        this.name = packetDict['name'] || null;
     }
 
     public dictify(): any {
