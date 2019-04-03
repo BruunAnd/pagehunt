@@ -27,13 +27,12 @@ class MovingEntity(Entity):
     def crossed_map_boundary(self, x, y):
         return x < 0 or y < 0 or x > self.world.world_size or y > self.world.world_size
 
-    async def move(self, server, x, y):
+    async def move(self, server, client, x, y):
         if self.confirm_movement(x, y):
-            # If movement is legit, update location information
+            # If movement is legit, broadcast the movement to everyone else
             # Otherwise send the current location to tell the client to return
             self.x = x
             self.y = y
+            await server.broadcast_packet(RepositionPacket(self), exclude_clients={client})
 
-        # Broadcast movement packet
-        # TODO: Insert some kind of delay for this as this may be the cause of weird movement
-        await server.broadcast_packet(RepositionPacket(self))
+        await server.send_packet(client, RepositionPacket(self))
