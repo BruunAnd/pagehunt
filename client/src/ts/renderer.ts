@@ -3,36 +3,58 @@ import Entity, {EntityType} from "./entities/entity";
 import {Game} from "./game";
 
 export default class Renderer {
-    canvas: Map<string, HTMLCanvasElement> = new Map<string, HTMLCanvasElement>();
-    ctx: Map<String, CanvasRenderingContext2D> = new Map<String, CanvasRenderingContext2D>();
+    canvas: HTMLCanvasElement;
     game: Game;
 
     constructor(game: Game, canvasId: string) {
         this.game = game;
-        const worldCanvas = <HTMLCanvasElement>document.getElementById(canvasId);
-        worldCanvas.width = window.innerWidth;
-        worldCanvas.height = window.innerHeight;
-        this.canvas.set('world', worldCanvas);
-        this.ctx.set('world', worldCanvas.getContext('2d'));
-        const fogCanvas = document.createElement('canvas');
-        fogCanvas.width = worldCanvas.width;
-        fogCanvas.height = worldCanvas.height;
-        this.canvas.set('fog', fogCanvas);
-        this.ctx.set('fog', fogCanvas.getContext('2d'));
-        const entityCanvas = document.createElement('canvas');
-        entityCanvas.width = worldCanvas.width;
-        entityCanvas.height = worldCanvas.height;
-        this.canvas.set('entity', entityCanvas);
-        this.ctx.set('entity', entityCanvas.getContext('2d'));
+        this.canvas = <HTMLCanvasElement>document.getElementById(canvasId);
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
 
         requestAnimationFrame(() => this.render());
     }
 
     public onResize(newWidth: number, newHeight: number) {
-        this.canvas.forEach((value: HTMLCanvasElement) => {
-            value.width = newWidth;
-            value.height = newHeight;
-        });
+        this.canvas.width = newWidth;
+        this.canvas.height = newHeight;
+    }
+
+    private fog_canvas(): HTMLCanvasElement {
+        const fog: HTMLCanvasElement = document.createElement('canvas');
+        fog.width = this.canvas.width;
+        fog.height = this.canvas.height;
+        const fogCtx = fog.getContext('2d');
+        fogCtx.fillStyle = '#000000';
+        fogCtx.fillRect(0, 0, fog.width, fog.height);
+
+        const x = (this.game.player.getPosition().x + this.game.player.transform.width / 2) - this.game.camera.getPosition().x;
+        const y = (this.game.player.getPosition().y + this.game.player.transform.height / 2) - this.game.camera.getPosition().y;
+        const lightMin = this.game.player.light - 10;
+        const lightMax = this.game.player.light + 10;
+
+        // Remove the fog of war in circle based on the light value
+        let radGrd: CanvasGradient;
+        if (this.game.player.hasLigth) {
+            radGrd = fogCtx.createRadialGradient(x, y, 20, x, y, Util.getRandomRange(lightMin, lightMax));
+            radGrd.addColorStop(0, 'rgba( 0, 0, 0,  1 )');
+            radGrd.addColorStop(this.game.player.lightDensity, 'rgba( 0, 0, 0, .6 )');
+            radGrd.addColorStop(1, 'rgba( 0, 0, 0,  0 )');
+            document.body.style.background = '#6a6a05';
+        } else {
+            radGrd = fogCtx.createRadialGradient(x, y, 20, x, y, this.game.player.light);
+            radGrd.addColorStop(0, 'rgba( 0, 0, 0, .4 )');
+            radGrd.addColorStop(.7, 'rgba( 0, 0, 0, .1 )');
+            radGrd.addColorStop(1, 'rgba( 0, 0, 0, 0 )');
+            document.body.style.background = '#554444';
+        }
+
+        fogCtx.globalCompositeOperation = 'xor';
+        fogCtx.fillStyle = radGrd;
+        fogCtx.arc(x, y, lightMax, 0, Math.PI * 2, true);
+        fogCtx.fill();
+
+        return fog;
     }
 
     private render() {
@@ -51,67 +73,42 @@ export default class Renderer {
             console.log("No player found!");
             return;
         }
-        console.log("Rendering..");
-        this.ctx.get('world').clearRect(0, 0, this.canvas.get('world').width, this.canvas.get('world').height);
+        const ctx = this.canvas.getContext('2d');
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // (Re)draw fog of war
-        this.ctx.get('fog').fillStyle = '#000000';
-        this.ctx.get('fog').fillRect(0, 0, this.canvas.get('fog').width, this.canvas.get('fog').height);
-
-        const x = (this.game.player.getPosition().x + this.game.player.transform.width / 2) - this.game.camera.getPosition().x;
-        const y = (this.game.player.getPosition().y + this.game.player.transform.height / 2) - this.game.camera.getPosition().y;
-        const lightMin = this.game.player.light - 10;
-        const lightMax = this.game.player.light + 10;
-
-        // Remove the fog of war in circle based on the light value
-        this.ctx.get('fog').beginPath();
-        let radGrd: CanvasGradient;
-        if (this.game.player.hasLigth) {
-            radGrd = this.ctx.get('world').createRadialGradient(x, y, 20, x, y, Util.getRandomRange(lightMin, lightMax));
-            radGrd.addColorStop(0, 'rgba( 0, 0, 0,  1 )');
-            radGrd.addColorStop(this.game.player.lightDensity, 'rgba( 0, 0, 0, .6 )');
-            radGrd.addColorStop(1, 'rgba( 0, 0, 0,  0 )');
-            document.body.style.background = '#6a6a05';
-        } else {
-            radGrd = this.ctx.get('world').createRadialGradient(x, y, 20, x, y, this.game.player.light);
-            radGrd.addColorStop(0, 'rgba( 0, 0, 0, .4 )');
-            radGrd.addColorStop(.7, 'rgba( 0, 0, 0, .1 )');
-            radGrd.addColorStop(1, 'rgba( 0, 0, 0, 0 )');
-            document.body.style.background = '#554444';
-        }
-
-        this.ctx.get('fog').globalCompositeOperation = 'xor';
-        this.ctx.get('fog').fillStyle = radGrd;
-        this.ctx.get('fog').arc(x, y, lightMax, 0, Math.PI * 2, true);
-        this.ctx.get('fog').fill();
-
-        this.ctx.get('fog').globalCompositeOperation = 'source-over';
-        this.ctx.get('fog').closePath();
-
-        this.game.world.getAllEntities().forEach((ent: Entity) => {
-            // Don't draw stuff that is not near us
-            if (ent.getPosition().distance(this.game.player.getPosition()) > this.game.player.light + 100) {
-                return;
+        let i: number;
+        for (i = 0; i < 3; i++) {
+            this.game.world.getEntitiesOnLayer(i).forEach((ent: Entity) => {
+                // Don't draw stuff that is not near us
+                if (ent.getPosition().distance(this.game.player.getPosition()) > this.game.player.light + 100) {
+                    return;
             }// This will be server side eventually
 
             const x = ent.getPosition().x - this.game.camera.getPosition().x;
             const y = ent.getPosition().y - this.game.camera.getPosition().y;
-            this.ctx.get('world').beginPath();
+            ctx.beginPath();
                 switch (ent.type) {
-                case EntityType.LocalPlayer:
-                    this.ctx.get('world').fillStyle = '#00AA00';
-                    break;
-                default:
-                    this.ctx.get('world').fillStyle = '#AA0000';
-                    break;
+                    case EntityType.Tree:
+                        ctx.fillStyle = '#006400';
+                        break;
+                    case EntityType.LocalPlayer:
+                        ctx.fillStyle = '#ffff00';
+                        break;
+                    case EntityType.Slender:
+                        ctx.fillStyle = '#000000';
+                        break;
+                    default:
+                        ctx.fillStyle = '#AA0000';
+                        break;
                 }
-                this.ctx.get('world').fillRect(x, y, ent.transform.width, ent.transform.height);
-                this.ctx.get('world').fillStyle = '#FFFFFF';
-                this.ctx.get('world').fillText(ent.name, x, y - 5);
-            this.ctx.get('world').closePath();
-        });
+                ctx.fillRect(x, y, ent.transform.width, ent.transform.height);
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fillText(ent.name, x, y - 5);
+            ctx.closePath();
+            });
+        }
 
-        this.ctx.get('world').drawImage(this.canvas.get('fog'), 0, 0);
+        ctx.drawImage(this.fog_canvas(), 0, 0);
         requestAnimationFrame(() => this.render());
     }
 }

@@ -4,7 +4,7 @@ import Transform from "../transform";
 export default class Page extends Entity {
 
     constructor(id: number, sprite: HTMLImageElement, transform?: Transform) {
-        super(id, EntityType.Tree, sprite, "Page", transform);
+        super(id, EntityType.Tree, sprite, "Page", 0, transform);
     }
 
     tick(dt: number) {

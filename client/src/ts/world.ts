@@ -24,6 +24,10 @@ export default class World {
         return Array.from(this.worldEntities.values());
     }
 
+    public getEntitiesOnLayer(layer: number): Entity[] {
+        return Array.from(this.worldEntities.values()).filter((ent: Entity) => ent.z === layer);
+    }
+
     public getEntity(id: number): Entity {
         if (!this.worldEntities.has(id)) {
             return null;

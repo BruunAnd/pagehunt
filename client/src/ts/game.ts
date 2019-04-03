@@ -27,7 +27,7 @@ export class Game {
     constructor(canvasId: string) {
         this.networkClient = new NetworkClient(this, 'localhost:4000');
         this.renderer = new Renderer(this, canvasId);
-        this.camera = new Camera(new Vector2D(0, 0), this.renderer.canvas.get('world'));
+        this.camera = new Camera(new Vector2D(0, 0), this.renderer.canvas);
 
         document.addEventListener('keydown', (event) => {
             Input.addKey(event.key);
@@ -37,7 +37,7 @@ export class Game {
         });
         window.addEventListener('resize', () => {
             this.renderer.onResize(window.innerWidth, window.innerHeight);
-            this.camera.onResize(this.renderer.canvas.get('world'));
+            this.camera.onResize(this.renderer.canvas);
             if (this.player)
                 this.camera.setPosition(this.player.transform.position);
         });
@@ -80,27 +80,6 @@ export class Game {
     }
 
     public handleSpawnEntity(packet: SpawnEntityPacket): void {
-        /*const transform = new Transform(packet.x, packet.y, 32, 32);
-        let entity: Entity;
-
-        switch (packet.entity) {
-            case EntityType.NetworkPlayer:
-                entity = new NetworkPlayer(packet.id, null, packet.name, transform);
-                break;
-            case EntityType.LocalPlayer:
-                entity = this.player = this.buildPlayer(packet.id, packet.name, transform);
-                this.camera.setPosition(transform.position);
-                break;
-            case EntityType.Light:
-                entity = new Light(packet.id, null, 20, transform);
-                break;
-            case EntityType.Slender:
-                entity = new Slender(packet.id, null, transform);
-                break;
-            default:
-                entity = new Tree(packet.id, null, transform)
-        }*/
-
         if (packet.entity == EntityType.LocalPlayer) {
             const transform = new Transform(packet.x, packet.y, 32, 32);
             this.player = this.buildPlayer(packet.id, packet.speed, packet.name, transform);

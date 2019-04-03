@@ -14,7 +14,7 @@ export default class Player extends Entity {
     readonly minLightLevel: number;
 
     constructor(id: number, sprite: HTMLImageElement, world: World, moveSpeed: number, name?: string, transform?: Transform) {
-        super(id, EntityType.LocalPlayer, sprite, name != null ? name : "Unknown Player", transform);
+        super(id, EntityType.LocalPlayer, sprite, name != null ? name : "Unknown Player", 1, transform);
         this.world = world;
         this.hasLigth = true;
         this.light = 300;

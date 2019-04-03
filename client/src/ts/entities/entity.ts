@@ -19,13 +19,15 @@ export enum EntityType {
 
 export default abstract class Entity {
     readonly id: number;
+    readonly z: number;
     readonly type: EntityType;
     readonly sprite: HTMLImageElement = null;
     readonly name: string;
     readonly transform: Transform;
 
-    protected constructor(id: number, type: EntityType, sprite: HTMLImageElement, name: string, transform?: Transform) {
+    protected constructor(id: number, type: EntityType, sprite: HTMLImageElement, name: string, z: number, transform?: Transform) {
         this.id = id;
+        this.z = z;
         this.type = type;
         this.sprite = sprite;
         this.name = name;
