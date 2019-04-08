@@ -2,6 +2,7 @@ import math
 from random import Random
 from noise import snoise3
 
+from server.game.entities.abilities.light import Light
 from server.game.entities.tree import Tree
 from server.game.world import World
 
@@ -45,6 +46,8 @@ class WorldGenerator:
                 y += 32
                 i += 1
             x += 32
+
+        entities.append(Light(world, 50, 50))
 
         world.add_multiple_spawn_points(spawn_points)
         world.add_multiple_world_entities(entities)

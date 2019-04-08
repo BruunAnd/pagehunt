@@ -11,6 +11,7 @@ import RemoveEntityPacket from "./packets/remove-entity";
 import Camera from "./camera";
 import Renderer from "./renderer";
 import WorldTransferPacket from "./packets/world-transfer";
+import PickupAbilityPacket from "./packets/pickup-ability";
 
 export class Game {
     tickrate: number = 40;
@@ -47,8 +48,8 @@ export class Game {
         this.enableInput = true;
     }
 
-    private buildPlayer(id: number, moveSpeed: number, name: string, transform?: Transform): Player {
-        const ply = new Player(id, null, this.world, moveSpeed, name, transform != null ? transform: null);
+    private buildPlayer(id: number, moveSpeed: number, name: string, initialLight: number, transform?: Transform): Player {
+        const ply = new Player(id, null, this.world, moveSpeed, initialLight, name, transform != null ? transform: null);
         this.lastPlayerPos = ply.transform.position;
         return ply;
     }
@@ -72,7 +73,6 @@ export class Game {
         this.camera.setPosition(this.player.transform.position);
         // Only send movement updates if we have actually moved
         if (this.player.transform.position.distance(this.lastPlayerPos) > 0.5) {
-            console.log("Sending movement packet");
             this.networkClient.sendPlayerMovement(this.player.transform.position);
         }
         this.lastPlayerPos = this.player.transform.position;
@@ -81,13 +81,21 @@ export class Game {
 
     public handleSpawnEntity(packet: SpawnEntityPacket): void {
         if (packet.entity == EntityType.LocalPlayer) {
-            const transform = new Transform(packet.x, packet.y, 32, 32);
-            this.player = this.buildPlayer(packet.id, packet.speed, packet.name, transform);
+            const transform: Transform = new Transform(packet.x, packet.y, 32, 32);
+            this.player = this.buildPlayer(packet.id, packet.speed, packet.name, packet.light, transform);
             this.camera.setPosition(transform.position);
             this.world.addEntity(this.player);
         }
         else {
             this.world.addEntity(this.world.constructEntity(packet));
+        }
+    }
+
+    public handlePickupAbility(packet: PickupAbilityPacket): void {
+        if (packet.ability === EntityType.Light) {
+            console.log(this.player.light);
+            this.player.light += packet.light;
+            console.log(this.player.light);
         }
     }
 
@@ -104,7 +112,6 @@ export class Game {
     }
 
     public handleRemoveEntity(packet: RemoveEntityPacket) {
-        console.log(`Player ${packet.id} disconnected!`);
         this.world.removeEntity(packet.id);
     }
 }

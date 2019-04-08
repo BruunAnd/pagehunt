@@ -3,9 +3,14 @@ from server.network.packets.entity.reposition_packet import RepositionPacket
 
 
 class MovingEntity(Entity):
-    def __init__(self, world, type, initial_x, initial_y, move_speed):
-        super().__init__(world, type, True, initial_x, initial_y)
+    def __init__(self, world, type, initial_x, initial_y, move_speed, name=None):
+        super().__init__(world, type, True, initial_x, initial_y, name)
         self.moveSpeed = move_speed
+
+    def get_network_entity(self):
+        values = super().get_network_entity()
+        values['speed'] = self.moveSpeed
+        return values
 
     def confirm_movement(self, x, y):
         if not self.can_move(x, y):

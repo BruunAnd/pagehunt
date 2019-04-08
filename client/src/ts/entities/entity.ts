@@ -5,6 +5,7 @@ import Light from "./light";
 import Page from "./page";
 import NetworkPlayer from "./network-player";
 import Slender from "./slender";
+import {WorldLayer} from "../world";
 
 export enum EntityType {
     Player = 10,
@@ -17,19 +18,27 @@ export enum EntityType {
     NetworkPlayer = 21
 }
 
+export enum EntityParent {
+    Base = 0,
+    Luminous = 1
+}
+
 export default abstract class Entity {
+    parent: EntityParent = EntityParent.Base;
     readonly id: number;
-    readonly z: number;
+    readonly z: WorldLayer;
     readonly type: EntityType;
     readonly sprite: HTMLImageElement = null;
+    readonly solid: boolean;
     readonly name: string;
     readonly transform: Transform;
 
-    protected constructor(id: number, type: EntityType, sprite: HTMLImageElement, name: string, z: number, transform?: Transform) {
+    protected constructor(id: number, type: EntityType, sprite: HTMLImageElement, solid: boolean, name: string, z: WorldLayer, transform?: Transform) {
         this.id = id;
         this.z = z;
         this.type = type;
         this.sprite = sprite;
+        this.solid = solid;
         this.name = name;
         this.transform = transform != null ? transform : new Transform(10,10, 32, 32);
     }

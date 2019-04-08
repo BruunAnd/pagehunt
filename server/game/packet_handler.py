@@ -15,6 +15,7 @@ class PacketHandler:
     async def handle_movement(self, client, packet: MovementPacket):
         player = self.game.client_player_map[client]
         await player.move(self.sockets_server, client, packet.x, packet.y)
+        await player.pickup(self.sockets_server, client, packet.x, packet.y)
 
     async def handle_handshake(self, client, packet: HandshakePacket):
         # Initialize player
@@ -31,11 +32,11 @@ class PacketHandler:
         self.game.world.add_world_entity(player)
 
         # Send spawn message to player
-        spawn_packet = SpawnEntityPacket(NetworkEntityType.LocalPlayer, player)
+        spawn_packet = SpawnEntityPacket(player, True)
         await self.sockets_server.send_packet(client, spawn_packet)
 
         # Broadcast spawn message to other players
-        spawn_packet.entity_type = NetworkEntityType.NetworkPlayer
+        spawn_packet.local_player = False
         await self.sockets_server.broadcast_packet(spawn_packet, exclude_clients={client})
 
     async def packet_received(self, client, packet):

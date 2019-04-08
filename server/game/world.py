@@ -1,4 +1,5 @@
 from queue import Queue
+from server.game.entities.abilities.ability_base import Ability
 
 
 class World:
@@ -7,6 +8,7 @@ class World:
         self.num_players = num_players
         self._world_spawns = Queue()
         self._world_entities = list()
+        self._abilities = list()
         self.current_entity_id = 0
 
     @property
@@ -23,8 +25,25 @@ class World:
     def num_spawn_points(self):
         return self._world_spawns.qsize()
 
+    @property
+    def world_entities(self):
+        return self._world_entities
+
+    @property
+    def ability_entities(self):
+        return self._abilities
+
+    @property
+    def network_world(self):
+        entities = list()
+        for entity in self._world_entities:
+            entities.append(entity.get_network_entity())
+        return dict(size=self.world_size, entities=entities)
+
     def add_world_entity(self, entity):
         self._world_entities.append(entity)
+        if isinstance(entity, Ability):
+            self._abilities.append(entity)
 
     def add_multiple_world_entities(self, entities):
         for entity in entities:
@@ -39,23 +58,13 @@ class World:
 
     def remove_map_entity(self, entity):
         self._world_entities.remove(entity)
+        if isinstance(entity, Ability):
+            self._abilities.remove(entity)
 
     def remove_map_entity_by_id(self, entity_id):
         self.remove_map_entity(self.get_entity_by_id(entity_id))
-
-    def get_world_entities(self):
-        return self._world_entities
 
     def get_entity_by_id(self, entity_id):
         for entity in self._world_entities:
             if entity.id == entity_id:
                 return entity
-
-    def get_network_world(self):
-        entities = list()
-        for entity in self._world_entities:
-            if not entity.name:
-                entities.append(dict(id=entity.id, type=entity.type, x=entity.x, y=entity.y, width=entity.width, height=entity.height))
-            else:
-                entities.append(dict(id=entity.id, type=entity.type, name=entity.name, x=entity.x, y=entity.y, width=entity.width, height=entity.height))
-        return dict(size=self.world_size, entities=entities)

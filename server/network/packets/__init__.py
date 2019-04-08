@@ -8,4 +8,5 @@ class PacketType(IntEnum):
     Movement = 3,
     Reposition = 4,
     RemoveEntity = 5,
-    WorldTransfer = 6
+    WorldTransfer = 6,
+    AbilityPickup = 7

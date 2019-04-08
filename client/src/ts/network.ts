@@ -8,6 +8,7 @@ import MovementPacket from "./packets/movement";
 import {Game} from "./game";
 import Vector2D from "./vector2d";
 import WorldTransferPacket from "./packets/world-transfer";
+import PickupAbilityPacket from "./packets/pickup-ability";
 
 export default class NetworkClient {
     private socket: WebSocket;
@@ -31,7 +32,7 @@ export default class NetworkClient {
     }
 
     private onError(event): void {
-        console.log(`Error: ${event}`);
+        console.error(`Error: ${event}`);
     }
 
     private constructPacket(data: any): Packet {
@@ -48,13 +49,14 @@ export default class NetworkClient {
                 return new RemoveEntityPacket(data);
             case PacketType.WorldTransfer:
                 return new WorldTransferPacket(data);
+            case PacketType.PickupAbility:
+                return new PickupAbilityPacket(data);
         }
 
         return null;
     }
 
     private packetReceived(packet: Packet): void {
-        console.log(`Received ${packet.packetType}`);
         switch (packet.packetType) {
             case PacketType.SpawnEntity:
                 return this.game.handleSpawnEntity(<SpawnEntityPacket> packet);
@@ -64,6 +66,8 @@ export default class NetworkClient {
                 return this.game.handleRemoveEntity(<RemoveEntityPacket> packet);
             case PacketType.WorldTransfer:
                 return this.game.handleWorldReceived(<WorldTransferPacket> packet);
+            case PacketType.PickupAbility:
+                return this.game.handlePickupAbility(<PickupAbilityPacket> packet);
         }
     }
 
@@ -73,8 +77,6 @@ export default class NetworkClient {
     }
 
     private onMessage(event): void {
-        console.log("Got message!");
-        console.log(JSON.parse(event.data));
         this.packetReceived(this.constructPacket(JSON.parse(event.data)));
     }
 

@@ -7,8 +7,7 @@ class TransferWorldPacket(Packet):
         self.world = world
 
     def dictify(self):
-        values = dict(type=self.get_type(), world=self.world.get_network_world())
-        return values
+        return dict(type=self.get_type(), world=self.world.network_world)
 
     def get_type(self):
         return PacketType.WorldTransfer

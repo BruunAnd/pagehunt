@@ -17,7 +17,7 @@ class Entity:
 
     def location_blocked(self, x, y):
         blocked = False
-        for ent in self.world.get_world_entities():
+        for ent in self.world.world_entities:
             if ent.id == self.id:
                 continue
 
@@ -25,5 +25,12 @@ class Entity:
                 if ent.solid:
                     blocked = True
                 break
-
         return blocked
+
+    def get_network_entity(self):
+        if self.name:
+            return dict(id=self.id, name=self.name, type=self.type, solid=self.solid,
+                        x=self.x, y=self.y, width=self.width, height=self.height)
+        else:
+            return dict(id=self.id, type=self.type, solid=self.solid,
+                        x=self.x, y=self.y, width=self.width, height=self.height)
