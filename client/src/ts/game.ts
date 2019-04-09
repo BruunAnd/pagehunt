@@ -13,6 +13,7 @@ import Renderer from "./renderer";
 import WorldTransferPacket from "./packets/world-transfer";
 import PickupAbilityPacket from "./packets/pickup-ability";
 import AudioManager from "./audio";
+import Util from "./util";
 
 export class Game {
     tickrate: number = 40;
@@ -75,7 +76,7 @@ export class Game {
 
         if (this.player.isMoving)
         {
-            const rnd = util.getRandomRange(0, 100);
+            const rnd = Util.getRandomRange(0, 100);
             console.log(rnd);
             if (rnd > 99)
                 this.audioManager.playAudio("branch");

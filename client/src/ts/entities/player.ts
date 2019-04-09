@@ -2,12 +2,13 @@ import Vector2D from "../vector2d";
 import World, {WorldLayer} from "../world";
 import Input from "../input";
 import MovementController, {Direction} from "../controls/movement";
-import Entity, {EntityType} from "./entity";
+import {EntityType} from "./entity";
 import Transform from "../transform";
 import LuminousEntity from "./luminous-entity";
 
 export default class Player extends LuminousEntity {
     world: World;
+    isMoving: boolean = false;
     private readonly moveSpeed: number;
 
     constructor(id: number, sprite: HTMLImageElement, world: World, moveSpeed: number, initialLight: number, name?: string, transform?: Transform) {
@@ -109,6 +110,7 @@ export default class Player extends LuminousEntity {
         }
 
         if (dir != Direction.None) {
+            this.isMoving = true;
             const angle = MovementController.getDegreesFromDirection(dir);
 
             if (angle != -1) {
