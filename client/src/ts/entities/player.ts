@@ -1,33 +1,25 @@
 import Vector2D from "../vector2d";
-import World from "../world";
+import World, {WorldLayer} from "../world";
 import Input from "../input";
 import MovementController, {Direction} from "../controls/movement";
 import Entity, {EntityType} from "./entity";
 import Transform from "../transform";
+import LuminousEntity from "./luminous-entity";
 
-export default class Player extends Entity {
-    hasLigth: boolean;
-    isMoving: boolean;
-    light: number;
-    readonly lightDensity: number;
-    readonly minLightLevel: number;
+export default class Player extends LuminousEntity {
+    world: World;
+    private readonly moveSpeed: number;
 
-    constructor(id: number, sprite: HTMLImageElement, world: World, name?: string, transform?: Transform) {
-        super(id, EntityType.LocalPlayer, sprite, world, name != null ? name : "Unknown Player", transform);
-        this.hasLigth = true;
-        this.light = 300;
-        this.lightDensity = .4;
-        this.minLightLevel = 200;
+    constructor(id: number, sprite: HTMLImageElement, world: World, moveSpeed: number, initialLight: number, name?: string, transform?: Transform) {
+        super(id, EntityType.LocalPlayer, sprite, false, name != null ? name : "Unknown Player", WorldLayer.Player,
+              initialLight, 100, .4, false, transform);
+        this.world = world;
+        this.moveSpeed = moveSpeed;
     }
 
     public tick(dt: number): void {
         this.checkMovement(dt);
-        if (this.hasLigth) {
-            this.light -= .1;
-        }
-        if (this.light < this.minLightLevel) {
-            this.hasLigth = false;
-        }
+        super.tick(dt);
     }
 
     public move(newPos: Vector2D): Vector2D {
@@ -68,7 +60,7 @@ export default class Player extends Entity {
 
                 //Position is occupied, cannot move!
                 console.log(`${this.name} collided with ${ent.name}`);
-                canMove = this.onCollision(ent);
+                canMove = !ent.solid;
             }
         }
 
@@ -80,21 +72,13 @@ export default class Player extends Entity {
         return this.transform.position;
     }
 
-    private onCollision(other: Entity): boolean {
-        /* This should NOT be on the client! Only on the server */
-        // TODO: Move server side
+    /*
+    private onCollision(other: Entity): void {
         switch (other.type) {
-            case EntityType.Page:
-                //Collect and move
-                return true;
-            case EntityType.Slender:
-                //Death
-                return true;
-            default:
-                //Blocked
-                return false;
+
         }
     }
+     */
 
     private checkMovement(dt: number): Vector2D {
         let dir: Direction = Direction.None;
@@ -125,12 +109,10 @@ export default class Player extends Entity {
         }
 
         if (dir != Direction.None) {
-            this.isMoving = true;
-            const moveSpeed = 10;
             const angle = MovementController.getDegreesFromDirection(dir);
 
             if (angle != -1) {
-                const newLocation = MovementController.getNewLocation(this.transform.position, angle, moveSpeed * dt);
+                const newLocation = MovementController.getNewLocation(this.transform.position, angle, this.moveSpeed * dt);
                 return this.move(newLocation);
             }
         }

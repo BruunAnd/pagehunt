@@ -7,6 +7,8 @@ import HandshakePacket from "./packets/handshake";
 import MovementPacket from "./packets/movement";
 import {Game} from "./game";
 import Vector2D from "./vector2d";
+import WorldTransferPacket from "./packets/world-transfer";
+import PickupAbilityPacket from "./packets/pickup-ability";
 
 export default class NetworkClient {
     private socket: WebSocket;
@@ -30,7 +32,7 @@ export default class NetworkClient {
     }
 
     private onError(event): void {
-        console.log(`Error: ${event}`);
+        console.error(`Error: ${event}`);
     }
 
     private constructPacket(data: any): Packet {
@@ -45,6 +47,10 @@ export default class NetworkClient {
                 return new RepositionPacket(data);
             case PacketType.RemoveEntity:
                 return new RemoveEntityPacket(data);
+            case PacketType.WorldTransfer:
+                return new WorldTransferPacket(data);
+            case PacketType.PickupAbility:
+                return new PickupAbilityPacket(data);
         }
 
         return null;
@@ -58,6 +64,10 @@ export default class NetworkClient {
                 return this.game.handleReposition(<RepositionPacket> packet);
             case PacketType.RemoveEntity:
                 return this.game.handleRemoveEntity(<RemoveEntityPacket> packet);
+            case PacketType.WorldTransfer:
+                return this.game.handleWorldReceived(<WorldTransferPacket> packet);
+            case PacketType.PickupAbility:
+                return this.game.handlePickupAbility(<PickupAbilityPacket> packet);
         }
     }
 

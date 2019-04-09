@@ -10,9 +10,9 @@ import RepositionPacket from "./packets/reposition";
 import RemoveEntityPacket from "./packets/remove-entity";
 import Camera from "./camera";
 import Renderer from "./renderer";
-import NetworkPlayer from "./entities/network-player";
+import WorldTransferPacket from "./packets/world-transfer";
+import PickupAbilityPacket from "./packets/pickup-ability";
 import AudioManager from "./audio";
-import util from "./util";
 
 export class Game {
     tickrate: number = 40;
@@ -30,8 +30,7 @@ export class Game {
     constructor(canvasId: string) {
         this.networkClient = new NetworkClient(this, 'localhost:4000');
         this.renderer = new Renderer(this, canvasId);
-        this.world = this.buildMap(); // TODO: Get world from server
-        this.camera = new Camera(new Vector2D(0, 0), this.renderer.canvas.get('world'));
+        this.camera = new Camera(new Vector2D(0, 0), this.renderer.canvas);
         this.audioManager = new AudioManager();
 
         document.addEventListener('keydown', (event) => {
@@ -42,7 +41,7 @@ export class Game {
         });
         window.addEventListener('resize', () => {
             this.renderer.onResize(window.innerWidth, window.innerHeight);
-            this.camera.onResize(this.renderer.canvas.get('world'));
+            this.camera.onResize(this.renderer.canvas);
             if (this.player)
                 this.camera.setPosition(this.player.transform.position);
         });
@@ -52,12 +51,8 @@ export class Game {
         this.enableInput = true;
     }
 
-    private buildMap(): World {
-        return new World(new Vector2D(2000, 2000));
-    }
-
-    private buildPlayer(id: number, name: string, transform?: Transform): Player {
-        const ply = new Player(id, null, this.world, name, transform != null ? transform: null);
+    private buildPlayer(id: number, moveSpeed: number, name: string, initialLight: number, transform?: Transform): Player {
+        const ply = new Player(id, null, this.world, moveSpeed, initialLight, name, transform != null ? transform: null);
         this.lastPlayerPos = ply.transform.position;
         return ply;
     }
@@ -99,18 +94,27 @@ export class Game {
     }
 
     public handleSpawnEntity(packet: SpawnEntityPacket): void {
-        const transform = new Transform(packet.x, packet.y, 32, 32);
-        let entity: Entity;
-
-        switch (packet.entity) {
-            case EntityType.LocalPlayer:
-                entity = this.player = this.buildPlayer(packet.id, packet.name, transform);
-                this.camera.setPosition(transform.position);
-                break;
-            default:
-                entity = new NetworkPlayer(packet.id, null, this.world, packet.name, transform);
+        if (packet.entity == EntityType.LocalPlayer) {
+            const transform: Transform = new Transform(packet.x, packet.y, 32, 32);
+            this.player = this.buildPlayer(packet.id, packet.speed, packet.name, packet.light, transform);
+            this.camera.setPosition(transform.position);
+            this.world.addEntity(this.player);
         }
-        this.world.addEntity(entity);
+        else {
+            this.world.addEntity(this.world.constructEntity(packet));
+        }
+    }
+
+    public handlePickupAbility(packet: PickupAbilityPacket): void {
+        if (packet.ability === EntityType.Light) {
+            console.log(this.player.light);
+            this.player.light += packet.light;
+            console.log(this.player.light);
+        }
+    }
+
+    public handleWorldReceived(packet: WorldTransferPacket): void {
+        this.world = packet.world;
     }
 
     public handleReposition(packet: RepositionPacket): void {
@@ -122,7 +126,6 @@ export class Game {
     }
 
     public handleRemoveEntity(packet: RemoveEntityPacket) {
-        console.log(`Player ${packet.id} disconnected!`);
         this.world.removeEntity(packet.id);
     }
 }
