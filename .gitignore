@@ -5,5 +5,4 @@
 
 # Docker stuff
 .dockerignore
-Dockerfile
 pagehunt.conf
