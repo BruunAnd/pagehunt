@@ -26,7 +26,7 @@ export class Game {
     lastPlayerPos: Vector2D;
     
     constructor(canvasId: string) {
-        this.networkClient = new NetworkClient(this, 'localhost:4000');
+        this.networkClient = new NetworkClient(this, '127.0.0.1:8080');
         this.renderer = new Renderer(this, canvasId);
         this.camera = new Camera(new Vector2D(0, 0), this.renderer.canvas);
 
