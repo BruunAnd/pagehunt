@@ -17,7 +17,7 @@ class SocketsServer:
         self.packet_event = AsyncEventHook()
         self.player_disconnected_event = AsyncEventHook()
 
-    def listen(self, host='', port=4000):
+    def listen(self, host='', port=8080):
         ws_server = websockets.serve(self.connected, host, port)
         print(f'Listening on {host}:{port}')
 
